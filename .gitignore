@@ -1,0 +1,45 @@
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Kotlin ###
+.kotlin
+
+### Others ###
+.gradle
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+/database-keystore.properties
+/test-database-keystore.properties
+/.idea/jarRepositories.xml
+/.idea/dataSources.xml
+/.idea/easycode.ignore
+/.idea/easycode/
+gradle/wrapper/gradle-wrapper.jar
