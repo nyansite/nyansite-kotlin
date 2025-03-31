@@ -37,10 +37,6 @@ class LogonController(
         session: HttpSession,
         response: HttpServletResponse
     ): ReturnErrorCode {
-        if (session.getAttribute("isLogon") as? Boolean ?: false) {
-            return ReturnErrorCode(7)
-        }
-
         if (username == User.USERNAME_DEFAULT && email == User.EMAIL_DEFAULT && phone == User.PHONE_DEFAULT) {
             return ReturnErrorCode(2)
         }
