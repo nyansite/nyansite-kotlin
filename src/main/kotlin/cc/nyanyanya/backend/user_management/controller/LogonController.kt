@@ -83,11 +83,17 @@ class LogonController(
             }
         }
 
+        val sessionUsername = session.getAttribute("username") as? String ?: User.USERNAME_DEFAULT
+        if (sessionUsername == dbUser.username) {
+            return ReturnErrorCode(1)
+        }
+
         session.setAttribute("username", dbUser.username)
         session.setAttribute("isLogin", true.toString())
         CookieTool.addCookie("username", dbUser.username, response)
-        CookieTool.addCookie("isLogon", true.toString(), response)
-        return ReturnErrorCode(loginByUser(dbUser).toByte())
+        CookieTool.addCookie("isLogin", true.toString(), response)
+        val loginResult = loginByUser(dbUser).toByte()
+        return ReturnErrorCode(loginResult)
     }
 
     @PostMapping("/logout")
@@ -95,12 +101,13 @@ class LogonController(
         session: HttpSession,
         response: HttpServletResponse,
     ): ReturnErrorCode {
-        if (session.getAttribute("isLogon") as? Boolean ?: false) {
+        val isLogin = (session.getAttribute("isLogin") as? String ?: "false").toBoolean()
+        if (!isLogin) {
             return ReturnErrorCode(1)
         }
 
         session.invalidate()
-        CookieTool.addCookie("isLogon", false.toString(), response)
+        CookieTool.addCookie("isLogin", false.toString(), response)
         return ReturnErrorCode(0)
     }
 }
