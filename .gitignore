@@ -43,3 +43,4 @@ build/
 /.idea/easycode.ignore
 /.idea/easycode/
 gradle/wrapper/gradle-wrapper.jar
+/hs_err_pid326284.log

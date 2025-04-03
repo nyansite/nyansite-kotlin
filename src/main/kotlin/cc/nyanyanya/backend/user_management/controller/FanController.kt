@@ -1,11 +1,9 @@
 package cc.nyanyanya.backend.user_management.controller
 
 
-import cc.nyanyanya.backend.common.persistence.entity.FollowGroup
-import cc.nyanyanya.backend.common.persistence.entity.FollowList
-import cc.nyanyanya.backend.common.persistence.model.User
+import cc.nyanyanya.backend.user_management.entity.FollowGroup
+import cc.nyanyanya.backend.user_management.entity.FollowList
 import cc.nyanyanya.backend.user_management.service.FanService
-import cc.nyanyanya.backend.user_management.service.UserService
 import org.springframework.web.bind.annotation.*
 import java.util.*
 

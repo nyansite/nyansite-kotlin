@@ -1,6 +1,6 @@
 package cc.nyanyanya.backend.common.persistence.model
 
-import cc.nyanyanya.backend.common.util.UuidTypeHandler
+import cc.nyanyanya.backend.common.util.type_handler.UuidTypeHandler
 import cc.nyanyanya.backend.common.util.bo.DefaultValue
 import com.baomidou.mybatisplus.annotation.*
 import java.util.*
@@ -8,16 +8,15 @@ import java.util.*
 @TableName(schema = "user_management_", value = "fan_")
 class Fan(
     @TableId(value = "id_", type = IdType.INPUT)
-    @TableField(typeHandler = UuidTypeHandler::class)
     var id: UUID,
 
-    @TableField(value = "user_id_", typeHandler = UuidTypeHandler::class)
+    @TableField(value = "user_id_")
     var userId: UUID,
 
-    @TableField("fan_id_", typeHandler = UuidTypeHandler::class)
+    @TableField("fan_id_")
     var fanId: UUID,
 
-    @TableField("group_id_", typeHandler = UuidTypeHandler::class)
+    @TableField("group_id_")
     var groupId: UUID,
 ) {
     companion object {

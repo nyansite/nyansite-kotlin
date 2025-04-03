@@ -2,8 +2,8 @@ package cc.nyanyanya.backend.common.persistence.repository
 
 import cc.nyanyanya.backend.common.persistence.mapper.UserMapper
 import cc.nyanyanya.backend.common.persistence.model.User
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
-import com.github.yulichang.extension.kt.KtLambdaWrapper
+import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
+import com.github.yulichang.extension.kt.toolkit.KtWrappers
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -11,19 +11,19 @@ class UserRepo(userMapper: UserMapper) {
     var userMapper = userMapper
 
     fun selectByUsername(username: String): User {
-        val queryWrapper = KtLambdaWrapper<User>()
+        val queryWrapper = KtQueryWrapper(User::class.java)
             .eq(User::username, username)
         return userMapper.selectOne(queryWrapper) ?: User()
     }
 
     fun selectByEmail(email: String): User {
-        val queryWrapper = KtLambdaWrapper<User>()
+        val queryWrapper = KtQueryWrapper(User::class.java)
             .eq(User::email, email)
         return userMapper.selectOne(queryWrapper) ?: User()
     }
 
     fun selectByPhone(phone: String): User {
-        val queryWrapper = KtLambdaWrapper<User>()
+        val queryWrapper = KtQueryWrapper(User::class.java)
             .eq(User::phone, phone)
         return userMapper.selectOne(queryWrapper) ?: User()
     }

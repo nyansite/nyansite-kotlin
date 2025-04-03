@@ -16,18 +16,6 @@ import org.springframework.web.bind.annotation.*
 class LogonController(
     private val userService: UserService
 ) {
-    private fun loginByUser(dbUser: User): Int {
-        if (dbUser == User()) {
-            return 6
-        }
-
-        if (userService.login(dbUser) == 1) {
-            return 5
-        }
-
-        return 0
-    }
-
     @PostMapping("/login")
     fun login(
         @RequestParam(defaultValue = User.USERNAME_DEFAULT) username: String,
@@ -37,22 +25,25 @@ class LogonController(
         session: HttpSession,
         response: HttpServletResponse
     ): ReturnErrorCode {
-        if (username == User.USERNAME_DEFAULT && email == User.EMAIL_DEFAULT && phone == User.PHONE_DEFAULT) {
-            return ReturnErrorCode(2)
-        }
-        if (userService.verifyPasswordFormat(password)) {
-            return ReturnErrorCode(3)
+        val isLogin = (session.getAttribute("isLogin") as? String ?: "false").toBoolean()
+        if (isLogin) {
+            return ReturnErrorCode(1)
         }
 
-        val args = listOf(username, email, phone)
-        val argsDefaultValues = listOf(
-            User.USERNAME_DEFAULT,
-            User.EMAIL_DEFAULT,
-            User.PHONE_DEFAULT
+        val isJustOneNull = LogicTool.isJustOneNotNull(
+            listOf(
+                username,
+                email,
+                phone
+            ),
+            listOf(
+                User.USERNAME_DEFAULT,
+                User.EMAIL_DEFAULT,
+                User.PHONE_DEFAULT
+            )
         )
-        val isJustOneNull = LogicTool.isJustOneNotNull(args, argsDefaultValues)
         if (!isJustOneNull.isTrue) {
-            return ReturnErrorCode(4)
+            return ReturnErrorCode(2)
         }
         val notNullArgIndex = isJustOneNull.trueIndex
 
@@ -60,40 +51,33 @@ class LogonController(
         when (notNullArgIndex) {
             0 -> {
                 // username
-                dbUser = userService.verifyUserByUsername(username)
-                if (!userService.verifyUsernameFormat(username)) {
-                    return ReturnErrorCode(2)
-                }
+                dbUser = userService.fetchUserByUsername(username)
             }
 
             1 -> {
                 // email
-                dbUser = userService.verifyUserByEmail(email)
-                if (!userService.verifyEmailFormat(email)) {
-                    return ReturnErrorCode(2)
-                }
+                dbUser = userService.fetchUserByEmail(email)
             }
 
             2 -> {
                 // phone
-                dbUser = userService.verifyUserByPhone(phone)
-                if (!userService.verifyPhoneFormat(phone)) {
-                    return ReturnErrorCode(2)
-                }
+                dbUser = userService.fetchUserByPhone(phone)
             }
         }
 
-        val sessionUsername = session.getAttribute("username") as? String ?: User.USERNAME_DEFAULT
-        if (sessionUsername == dbUser.username) {
-            return ReturnErrorCode(1)
+        if (dbUser == User()) {
+            return ReturnErrorCode(4)
+        }
+
+        if (userService.login(dbUser, password) == 1) {
+            return ReturnErrorCode(3)
         }
 
         session.setAttribute("username", dbUser.username)
         session.setAttribute("isLogin", true.toString())
         CookieTool.addCookie("username", dbUser.username, response)
-        CookieTool.addCookie("isLogin", true.toString(), response)
-        val loginResult = loginByUser(dbUser).toByte()
-        return ReturnErrorCode(loginResult)
+
+        return ReturnErrorCode(0)
     }
 
     @PostMapping("/logout")
@@ -107,7 +91,6 @@ class LogonController(
         }
 
         session.invalidate()
-        CookieTool.addCookie("isLogin", false.toString(), response)
         return ReturnErrorCode(0)
     }
 }

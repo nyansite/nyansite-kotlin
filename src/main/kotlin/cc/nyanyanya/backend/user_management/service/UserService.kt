@@ -1,31 +1,37 @@
 package cc.nyanyanya.backend.user_management.service
 
 import cc.nyanyanya.backend.common.persistence.model.User
+import cc.nyanyanya.backend.common.persistence.repository.FileRepo
+import cc.nyanyanya.backend.common.persistence.repository.LevelRepo
 import cc.nyanyanya.backend.common.persistence.repository.UserRepo
-//import org.example.springdemo.util.CustomException
+import org.apache.commons.io.FilenameUtils
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.RequestParam
 
 @Service
-class UserService(userRepo: UserRepo) {
+class UserService(
+    userRepo: UserRepo,
+    private val fileRepo: FileRepo,
+    repo: FileRepo,
+    private val levelRepo: LevelRepo
+) {
     var userRepo: UserRepo = userRepo
 
-    fun verifyUserByUsername(username: String): User {
+    fun fetchUserByUsername(username: String): User {
         return userRepo.selectByUsername(username)
     }
 
-    fun verifyUserByEmail(email: String): User {
+    fun fetchUserByEmail(email: String): User {
         return userRepo.selectByEmail(email)
     }
 
-    fun verifyUserByPhone(phone: String): User {
+    fun fetchUserByPhone(phone: String): User {
         return userRepo.selectByPhone(phone)
     }
 
-    fun login(user: User): Int {
+    fun login(user: User, password: String): Int {
         val dbUser: User = userRepo.selectByUsername(user.username)
 
-        if (user.password != dbUser.password) {
+        if (password != dbUser.password) {
             return 1
         }
         return 0
@@ -45,5 +51,13 @@ class UserService(userRepo: UserRepo) {
 
     fun verifyPasswordFormat(password: String): Boolean {
         return userRepo.verifyPasswordFormat(password)
+    }
+
+    fun readAvatar(avatorPath: String): String {
+        val avatorBase64String = fileRepo.readFileToBase64String(avatorPath)
+        val fileExtension = FilenameUtils.getExtension(avatorPath)
+        val encodeString = "data:image/${fileExtension};base64,${avatorBase64String}"
+
+        return encodeString
     }
 }

@@ -8,6 +8,7 @@ spring:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  type-handlers-package: cc/nyanyanya/backend/common/util/type_handler
 
 
 server:

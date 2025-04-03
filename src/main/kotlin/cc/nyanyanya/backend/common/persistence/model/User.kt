@@ -1,6 +1,5 @@
 package cc.nyanyanya.backend.common.persistence.model
 
-import cc.nyanyanya.backend.common.util.UuidTypeHandler
 import cc.nyanyanya.backend.common.util.bo.DefaultValue
 import com.baomidou.mybatisplus.annotation.IdType
 import com.baomidou.mybatisplus.annotation.TableId
@@ -16,7 +15,6 @@ data class User(
         value = "id_",
         type = IdType.INPUT,
     )
-    @TableField(typeHandler = UuidTypeHandler::class)
     var id: UUID,
 
     @TableField(value = "username_")
@@ -29,7 +27,7 @@ data class User(
     var phone: String,
 
     @TableField(value = "gender_id_")
-    var gender: Short,
+    var genderId: Short,
 
     @TableField(value = "email_")
     var email: String,
@@ -41,7 +39,7 @@ data class User(
     var birthday: Date,
 
     @TableField(value = "level_id_")
-    var level_id: Short,
+    var levelId: Short,
 
     @TableField(value = "signup_time_")
     var signupTime: Timestamp,
@@ -57,6 +55,7 @@ data class User(
         const val NICKNAME_DEFAULT = " "
         const val USERNAME_DEFAULT = "      "
         const val PHONE_DEFAULT = "000000000000"
+        const val GENDER_ID_DEFAULT = DefaultValue.DEFAULT_SHORT
         const val EMAIL_DEFAULT = "-@-.--"
         const val AVATAR_PATH_DEFAULT = "  "
         val BIRTHDAY_DEFAULT = DefaultValue().DEFAULT_DATE
@@ -71,11 +70,11 @@ data class User(
         username = USERNAME_DEFAULT,
         nickName = NICKNAME_DEFAULT,
         phone = PHONE_DEFAULT,
-        gender = LEVEL_ID_DEFAULT,
+        genderId = GENDER_ID_DEFAULT,
         email = EMAIL_DEFAULT,
         avatarPath = AVATAR_PATH_DEFAULT,
         birthday = BIRTHDAY_DEFAULT,
-        level_id = LEVEL_ID_DEFAULT,
+        levelId = LEVEL_ID_DEFAULT,
         signupTime = SIGNUP_TIME_DEFAULT,
         password = PASSWORD_DEFAULT,
         phoneModifyTime = PHONE_MODIFY_TIME_DEFAULT

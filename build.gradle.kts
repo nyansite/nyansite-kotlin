@@ -43,6 +43,7 @@ repositories {
 
 dependencies {
     implementation("org.apache.commons:commons-lang3:3.17.0")
+    implementation("commons-io:commons-io:2.18.0")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
 
@@ -71,6 +72,7 @@ dependencies {
     implementation("com.github.yulichang:mybatis-plus-join-boot-starter:1.5.3")
 
     implementation("com.fasterxml.uuid:java-uuid-generator:5.1.0")
+    implementation("com.squareup.okio:okio:3.10.2")
 }
 
 kotlin {
