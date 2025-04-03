@@ -1,7 +1,6 @@
 package cc.nyanyanya.backend.common.util
 
 import cc.nyanyanya.backend.common.util.bo.DefaultValue
-import kotlin.Throws
 
 object LogicTool {
     @Throws(IllegalArgumentException::class)

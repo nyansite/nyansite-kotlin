@@ -1,31 +1,35 @@
 package cc.nyanyanya.backend.common.persistence.repository
 
 import cc.nyanyanya.backend.common.persistence.mapper.UserMapper
-import cc.nyanyanya.backend.common.persistence.model.User
+import cc.nyanyanya.backend.common.persistence.model.UserModel
 import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
-import com.github.yulichang.extension.kt.toolkit.KtWrappers
 import org.springframework.stereotype.Repository
+import java.util.*
 
 @Repository
-class UserRepo(userMapper: UserMapper) {
-    var userMapper = userMapper
-
-    fun selectByUsername(username: String): User {
-        val queryWrapper = KtQueryWrapper(User::class.java)
-            .eq(User::username, username)
-        return userMapper.selectOne(queryWrapper) ?: User()
+class UserRepo(private val userMapper: UserMapper) {
+    fun selectById(id: UUID): UserModel {
+        val queryWrapper = KtQueryWrapper(UserModel::class.java)
+            .eq(UserModel::id, id)
+        return userMapper.selectOne(queryWrapper) ?: UserModel()
     }
 
-    fun selectByEmail(email: String): User {
-        val queryWrapper = KtQueryWrapper(User::class.java)
-            .eq(User::email, email)
-        return userMapper.selectOne(queryWrapper) ?: User()
+    fun selectByUsername(username: String): UserModel {
+        val queryWrapper = KtQueryWrapper(UserModel::class.java)
+            .eq(UserModel::username, username)
+        return userMapper.selectOne(queryWrapper) ?: UserModel()
     }
 
-    fun selectByPhone(phone: String): User {
-        val queryWrapper = KtQueryWrapper(User::class.java)
-            .eq(User::phone, phone)
-        return userMapper.selectOne(queryWrapper) ?: User()
+    fun selectByEmail(email: String): UserModel {
+        val queryWrapper = KtQueryWrapper(UserModel::class.java)
+            .eq(UserModel::email, email)
+        return userMapper.selectOne(queryWrapper) ?: UserModel()
+    }
+
+    fun selectByPhone(phone: String): UserModel {
+        val queryWrapper = KtQueryWrapper(UserModel::class.java)
+            .eq(UserModel::phone, phone)
+        return userMapper.selectOne(queryWrapper) ?: UserModel()
     }
 
     fun verifyUsernameFormat(username: String): Boolean {

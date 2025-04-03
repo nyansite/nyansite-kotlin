@@ -1,12 +1,11 @@
 package cc.nyanyanya.backend.common.persistence.model
 
-import cc.nyanyanya.backend.common.util.type_handler.UuidTypeHandler
 import cc.nyanyanya.backend.common.util.bo.DefaultValue
 import com.baomidou.mybatisplus.annotation.*
 import java.util.*
 
 @TableName(schema = "user_management_", value = "fan_")
-class Fan(
+class FanModel(
     @TableId(value = "id_", type = IdType.INPUT)
     var id: UUID,
 

@@ -1,11 +1,9 @@
 package cc.nyanyanya.backend.common.config
 
-import cc.nyanyanya.backend.common.util.bo.DefaultValue
 import com.baomidou.mybatisplus.annotation.DbType
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor
 import org.mybatis.spring.annotation.MapperScan
-import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 

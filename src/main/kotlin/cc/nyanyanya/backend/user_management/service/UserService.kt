@@ -1,37 +1,40 @@
 package cc.nyanyanya.backend.user_management.service
 
-import cc.nyanyanya.backend.common.persistence.model.User
+import cc.nyanyanya.backend.common.persistence.model.UserModel
 import cc.nyanyanya.backend.common.persistence.repository.FileRepo
 import cc.nyanyanya.backend.common.persistence.repository.LevelRepo
 import cc.nyanyanya.backend.common.persistence.repository.UserRepo
 import org.apache.commons.io.FilenameUtils
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class UserService(
-    userRepo: UserRepo,
+    private val userRepo: UserRepo,
     private val fileRepo: FileRepo,
-    repo: FileRepo,
+    private val repo: FileRepo,
     private val levelRepo: LevelRepo
 ) {
-    var userRepo: UserRepo = userRepo
+    fun fetchUserById(id: UUID): UserModel {
+        return userRepo.selectById(id)
+    }
 
-    fun fetchUserByUsername(username: String): User {
+    fun fetchUserByUsername(username: String): UserModel {
         return userRepo.selectByUsername(username)
     }
 
-    fun fetchUserByEmail(email: String): User {
+    fun fetchUserByEmail(email: String): UserModel {
         return userRepo.selectByEmail(email)
     }
 
-    fun fetchUserByPhone(phone: String): User {
+    fun fetchUserByPhone(phone: String): UserModel {
         return userRepo.selectByPhone(phone)
     }
 
-    fun login(user: User, password: String): Int {
-        val dbUser: User = userRepo.selectByUsername(user.username)
+    fun login(userModel: UserModel, password: String): Int {
+        val dbUserModel: UserModel = userRepo.selectByUsername(userModel.username)
 
-        if (password != dbUser.password) {
+        if (password != dbUserModel.password) {
             return 1
         }
         return 0

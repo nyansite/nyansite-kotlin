@@ -1,23 +1,21 @@
 package cc.nyanyanya.backend.common.persistence.repository
 
-import cc.nyanyanya.backend.common.persistence.mapper.FanMapper
 import cc.nyanyanya.backend.common.persistence.mapper.LevelMapper
-import cc.nyanyanya.backend.common.persistence.model.Level
+import cc.nyanyanya.backend.common.persistence.model.LevelModel
 import com.github.yulichang.extension.kt.toolkit.KtWrappers
 import org.springframework.stereotype.Repository
-import java.util.*
 
 @Repository
 class LevelRepo(
     private val levelMapper: LevelMapper
 ) {
-    fun getAllLevels(): List<Level> {
-        val queryWrapper = KtWrappers.query(Level::class.java)
-            .selectAll(Level::class.java)
+    fun getAllLevels(): List<LevelModel> {
+        val queryWrapper = KtWrappers.query(LevelModel::class.java)
+            .selectAll(LevelModel::class.java)
         val followListRaw = levelMapper.selectList(queryWrapper)
-        val followList = mutableListOf<Level>()
+        val followList = mutableListOf<LevelModel>()
         followListRaw.forEach() { it ->
-            followList.add(it ?: Level())
+            followList.add(it ?: LevelModel())
         }
         return followList
     }

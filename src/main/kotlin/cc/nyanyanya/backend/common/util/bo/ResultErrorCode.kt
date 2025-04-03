@@ -1,5 +1,5 @@
 package cc.nyanyanya.backend.common.util.bo
 
-data class ReturnErrorCode(
+data class ResultErrorCode(
     var error: Byte = DefaultValue.DEFAULT_BYTE
 )

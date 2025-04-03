@@ -4,7 +4,7 @@ import cc.nyanyanya.backend.user_management.entity.FollowGroup
 import cc.nyanyanya.backend.user_management.entity.FollowList
 import cc.nyanyanya.backend.common.persistence.mapper.FanGroupMapper
 import cc.nyanyanya.backend.common.persistence.mapper.FanMapper
-import cc.nyanyanya.backend.common.persistence.model.Fan
+import cc.nyanyanya.backend.common.persistence.model.FanModel
 import cc.nyanyanya.backend.common.persistence.repository.FanGroupRepo
 import cc.nyanyanya.backend.common.util.bo.DefaultValue
 import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
@@ -12,7 +12,11 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-class FollowRepo(val fanMapper: FanMapper, val fanGroupMapper: FanGroupMapper, val fanGroupRepo: FanGroupRepo) {
+class FollowRepo(
+    private val fanMapper: FanMapper,
+    private val fanGroupMapper: FanGroupMapper,
+    private val fanGroupRepo: FanGroupRepo
+) {
     fun getAllFollows(id: UUID): FollowList {
         val followGroupNumberMax = fanGroupRepo.getMaxNumberByUserId(id)
 
@@ -29,16 +33,16 @@ class FollowRepo(val fanMapper: FanMapper, val fanGroupMapper: FanGroupMapper, v
 
     fun getFollowGroupByGroupNumber(id: UUID, groupNumber: Short): FollowGroup {
         val group = fanGroupRepo.selectByNumberAndUserId(groupNumber, id)
-        val queryWrapper = KtQueryWrapper(Fan::class.java)
-            .select(Fan::userId)
+        val queryWrapper = KtQueryWrapper(FanModel::class.java)
+            .select(FanModel::userId)
             .and({
-                it.eq(Fan::fanId, id).eq(Fan::groupId, group.id)
+                it.eq(FanModel::fanId, id).eq(FanModel::groupId, group.id)
             })
 
-        val followList = mutableListOf<Fan>()
+        val followList = mutableListOf<FanModel>()
         val followListRaw = fanMapper.selectList(queryWrapper)
         followListRaw.forEach() { it ->
-            followList.add(it ?: Fan())
+            followList.add(it ?: FanModel())
         }
 
         val followGroup = FollowGroup(id, group.name, followList)

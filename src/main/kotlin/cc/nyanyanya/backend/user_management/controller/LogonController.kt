@@ -1,10 +1,10 @@
 package cc.nyanyanya.backend.user_management.controller
 
 
-import cc.nyanyanya.backend.common.persistence.model.User
+import cc.nyanyanya.backend.common.persistence.model.UserModel
 import cc.nyanyanya.backend.common.util.CookieTool
 import cc.nyanyanya.backend.common.util.LogicTool
-import cc.nyanyanya.backend.common.util.bo.ReturnErrorCode
+import cc.nyanyanya.backend.common.util.bo.ResultErrorCode
 import cc.nyanyanya.backend.user_management.service.UserService
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.servlet.http.HttpSession
@@ -18,16 +18,16 @@ class LogonController(
 ) {
     @PostMapping("/login")
     fun login(
-        @RequestParam(defaultValue = User.USERNAME_DEFAULT) username: String,
-        @RequestParam(defaultValue = User.EMAIL_DEFAULT) email: String,
-        @RequestParam(defaultValue = User.PHONE_DEFAULT) phone: String,
-        @RequestParam(defaultValue = User.PASSWORD_DEFAULT) password: String,
+        @RequestParam username: String,
+        @RequestParam email: String,
+        @RequestParam phone: String,
+        @RequestParam password: String,
         session: HttpSession,
         response: HttpServletResponse
-    ): ReturnErrorCode {
+    ): ResultErrorCode {
         val isLogin = (session.getAttribute("isLogin") as? String ?: "false").toBoolean()
         if (isLogin) {
-            return ReturnErrorCode(1)
+            return ResultErrorCode(1)
         }
 
         val isJustOneNull = LogicTool.isJustOneNotNull(
@@ -37,60 +37,59 @@ class LogonController(
                 phone
             ),
             listOf(
-                User.USERNAME_DEFAULT,
-                User.EMAIL_DEFAULT,
-                User.PHONE_DEFAULT
+                "",
+                "",
+                "",
             )
         )
         if (!isJustOneNull.isTrue) {
-            return ReturnErrorCode(2)
+            return ResultErrorCode(2)
         }
         val notNullArgIndex = isJustOneNull.trueIndex
 
-        var dbUser = User()
+        var dbUserModel = UserModel()
         when (notNullArgIndex) {
             0 -> {
                 // username
-                dbUser = userService.fetchUserByUsername(username)
+                dbUserModel = userService.fetchUserByUsername(username)
             }
 
             1 -> {
                 // email
-                dbUser = userService.fetchUserByEmail(email)
+                dbUserModel = userService.fetchUserByEmail(email)
             }
 
             2 -> {
                 // phone
-                dbUser = userService.fetchUserByPhone(phone)
+                dbUserModel = userService.fetchUserByPhone(phone)
             }
         }
 
-        if (dbUser == User()) {
-            return ReturnErrorCode(4)
+        if (dbUserModel == UserModel()) {
+            return ResultErrorCode(4)
         }
 
-        if (userService.login(dbUser, password) == 1) {
-            return ReturnErrorCode(3)
+        if (userService.login(dbUserModel, password) == 1) {
+            return ResultErrorCode(3)
         }
 
-        session.setAttribute("username", dbUser.username)
+        session.setAttribute("username", dbUserModel.username)
         session.setAttribute("isLogin", true.toString())
-        CookieTool.addCookie("username", dbUser.username, response)
+        CookieTool.addCookie("username", dbUserModel.username, response)
 
-        return ReturnErrorCode(0)
+        return ResultErrorCode(0)
     }
 
     @PostMapping("/logout")
     fun logout(
         session: HttpSession,
-        response: HttpServletResponse,
-    ): ReturnErrorCode {
+    ): ResultErrorCode {
         val isLogin = (session.getAttribute("isLogin") as? String ?: "false").toBoolean()
         if (!isLogin) {
-            return ReturnErrorCode(1)
+            return ResultErrorCode(1)
         }
 
         session.invalidate()
-        return ReturnErrorCode(0)
+        return ResultErrorCode(0)
     }
 }

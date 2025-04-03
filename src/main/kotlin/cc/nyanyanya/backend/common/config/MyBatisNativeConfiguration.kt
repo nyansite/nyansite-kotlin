@@ -153,6 +153,7 @@ class MyBatisNativeConfiguration {
             hints.reflection().registerType(MPJLambdaWrapper::class.java, *MemberCategory.entries.toTypedArray())
             hints.reflection().registerType(KtQueryWrapper::class.java, *MemberCategory.entries.toTypedArray())
             hints.reflection().registerType(KtUpdateWrapper::class.java, *MemberCategory.entries.toTypedArray())
+            hints.reflection().registerType(KtLambdaWrapper::class.java, *MemberCategory.entries.toTypedArray())
 
             hints.reflection().registerType(BoundSql::class.java, MemberCategory.DECLARED_FIELDS)
             hints.reflection().registerType(RoutingStatementHandler::class.java, MemberCategory.DECLARED_FIELDS)

@@ -10,7 +10,7 @@ import java.util.Date
 import java.util.UUID
 
 @TableName(schema = "user_management_", value = "user_")
-data class User(
+data class UserModel(
     @TableId(
         value = "id_",
         type = IdType.INPUT,

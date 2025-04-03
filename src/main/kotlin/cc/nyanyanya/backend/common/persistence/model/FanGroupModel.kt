@@ -1,6 +1,5 @@
 package cc.nyanyanya.backend.common.persistence.model
 
-import cc.nyanyanya.backend.common.util.type_handler.UuidTypeHandler
 import cc.nyanyanya.backend.common.util.bo.DefaultValue
 import com.baomidou.mybatisplus.annotation.IdType
 import com.baomidou.mybatisplus.annotation.TableField
@@ -9,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName
 import java.util.UUID
 
 @TableName(schema = "user_management_", value = "fan_group_")
-class FanGroup(
+class FanGroupModel(
     @TableId(value = "id_", type = IdType.AUTO)
     var id: UUID,
 

@@ -6,9 +6,7 @@ import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
-class FollowService(followRepo: FollowRepo) {
-    var followRepo: FollowRepo = followRepo
-
+class FollowService(private val followRepo: FollowRepo) {
     fun fetchAllFollows(id: UUID): FollowList {
         return followRepo.getAllFollows(id)
     }
