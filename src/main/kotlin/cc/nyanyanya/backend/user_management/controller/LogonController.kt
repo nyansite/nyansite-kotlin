@@ -74,6 +74,7 @@ class LogonController(
         }
 
         session.setAttribute("username", dbUserModel.username)
+        session.setAttribute("id", dbUserModel.id)
         session.setAttribute("isLogin", true.toString())
         CookieTool.addCookie("username", dbUserModel.username, response)
 
