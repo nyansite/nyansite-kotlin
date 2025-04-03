@@ -153,7 +153,7 @@ class UserController(
         userInfo.email = dbUser.email
         userInfo.level = dbUser.levelId
         // TODO: localdebug
-        userInfo.avatar = userService.readAvatar(dbUser.avatarPath)
+//        userInfo.avatar = userService.readAvatar(dbUser.avatarPath)
         userInfo.birthday = dbUser.birthday
         userInfo.follows = followsInfoTransformer(followService.fetchAllFollows(userInfo.id))
         userInfo.fans = fansInfoTransformer(fanService.fetchAllFans(userInfo.id))
