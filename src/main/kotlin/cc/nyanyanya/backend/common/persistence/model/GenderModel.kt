@@ -6,26 +6,26 @@ import com.baomidou.mybatisplus.annotation.TableField
 import com.baomidou.mybatisplus.annotation.TableId
 import com.baomidou.mybatisplus.annotation.TableName
 
-@TableName(schema = "user_management_", value = "level_")
-class LevelModel(
+@TableName(schema = "user_management_", value = "gender_")
+class GenderModel(
     @TableId(value = "id_", type = IdType.AUTO)
     var id: Short,
 
-    @TableField(value = "number_")
-    var number: Short,
-
     @TableField(value = "name_")
     var name: String,
+
+    @TableField(value = "alias_")
+    var alias: String,
 ) {
     companion object {
         val ID_DEFAULT = DefaultValue.DEFAULT_SHORT
-        const val NUMBER_DEFAULT = DefaultValue.DEFAULT_SHORT
         const val NAME_DEFAULT = ""
+        const val ALIAS_DEFAULT = ""
     }
 
     constructor() : this(
         id = ID_DEFAULT,
-        number = NUMBER_DEFAULT,
-        name = NAME_DEFAULT
+        name = NAME_DEFAULT,
+        alias = ALIAS_DEFAULT
     )
 }

@@ -23,8 +23,8 @@ class FanService(
         fanUsername: String,
         userId: UUID
     ): Boolean {
-        val fanUserModel = userRepo.selectByUsername(fanUsername)
-        val deleteNumber = fanRepo.deleteByUserId(fanUserModel.id, userId)
+        val fanUser = userRepo.selectByUsername(fanUsername)
+        val deleteNumber = fanRepo.deleteByUserId(fanUser.id, userId)
         var success = false
         if (deleteNumber >= 1) {
             success = true
@@ -37,10 +37,10 @@ class FanService(
         followUserId: UUID,
         groupName: String
     ): Boolean {
-        val fanUserModel = userRepo.selectByUsername(fanUsername)
-        val fanGroupModel = fanGroupRepo.selectByNameAndUserId(groupName, fanUserModel.id)
+        val fanUser = userRepo.selectByUsername(fanUsername)
+        val fanGroupModel = fanGroupRepo.selectByNameAndUserId(groupName, fanUser.id)
         val result = fanRepo.insertByFanId(
-            fanId = fanUserModel.id,
+            fanId = fanUser.id,
             followUserId = followUserId,
             groupId = fanGroupModel.id
         )

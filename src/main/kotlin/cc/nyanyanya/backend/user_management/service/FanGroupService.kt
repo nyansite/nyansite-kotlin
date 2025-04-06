@@ -13,21 +13,21 @@ class FanGroupService(
     private val fanRepo: FanRepo
 ) {
     fun fetchFanGroupByNameAndUsername(name: String, username: String): FanGroupModel {
-        val dbUserModel = userRepo.selectByUsername(username)
-        val fanGroupModel = fanGroupRepo.selectByNameAndUserId(name, dbUserModel.id)
+        val dbUser = userRepo.selectByUsername(username)
+        val fanGroupModel = fanGroupRepo.selectByNameAndUserId(name, dbUser.id)
         return fanGroupModel
     }
 
     fun addFanGroupByFanUsername(fanUsername: String, groupName: String): Boolean {
-        val fanUserModel = userRepo.selectByUsername(fanUsername)
-        val result = fanGroupRepo.insertByGroupName(fanUserModel.id, groupName)
+        val fanUser = userRepo.selectByUsername(fanUsername)
+        val result = fanGroupRepo.insertByGroupName(fanUser.id, groupName)
         return if (result > 1) true else false
     }
 
     fun removeFanGroupByFanGroupName(fanUsername: String, groupName: String): Boolean {
-        val fanUserModel = userRepo.selectByUsername(fanUsername)
-        val fanGroupModel = fanGroupRepo.selectByNameAndUserId(groupName, fanUserModel.id)
-        val resultDeleteFans = fanRepo.deleteByFanIdAndGroupId(fanUserModel.id, fanGroupModel.id)
+        val fanUser = userRepo.selectByUsername(fanUsername)
+        val fanGroupModel = fanGroupRepo.selectByNameAndUserId(groupName, fanUser.id)
+        val resultDeleteFans = fanRepo.deleteByFanIdAndGroupId(fanUser.id, fanGroupModel.id)
         val resultDeleteFanGroup = fanGroupRepo.deleteById(fanGroupModel.id)
         return if (resultDeleteFans > 0 && resultDeleteFanGroup > 0) true else false
     }

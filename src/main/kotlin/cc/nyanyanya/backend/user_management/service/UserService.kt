@@ -31,10 +31,10 @@ class UserService(
         return userRepo.selectByPhone(phone)
     }
 
-    fun login(userModel: UserModel, password: String): Int {
-        val dbUserModel: UserModel = userRepo.selectByUsername(userModel.username)
+    fun login(user: UserModel, password: String): Int {
+        val dbUser: UserModel = userRepo.selectByUsername(user.username)
 
-        if (password != dbUserModel.password) {
+        if (password != dbUser.password) {
             return 1
         }
         return 0

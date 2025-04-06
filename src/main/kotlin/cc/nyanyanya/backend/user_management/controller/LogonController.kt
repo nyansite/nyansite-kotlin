@@ -47,36 +47,36 @@ class LogonController(
         }
         val notNullArgIndex = isJustOneNull.trueIndex
 
-        var dbUserModel = UserModel()
+        var dbUser = UserModel()
         when (notNullArgIndex) {
             0 -> {
                 // username
-                dbUserModel = userService.fetchUserByUsername(username)
+                dbUser = userService.fetchUserByUsername(username)
             }
 
             1 -> {
                 // email
-                dbUserModel = userService.fetchUserByEmail(email)
+                dbUser = userService.fetchUserByEmail(email)
             }
 
             2 -> {
                 // phone
-                dbUserModel = userService.fetchUserByPhone(phone)
+                dbUser = userService.fetchUserByPhone(phone)
             }
         }
 
-        if (dbUserModel == UserModel()) {
+        if (dbUser == UserModel()) {
             return ResultErrorCode(4)
         }
 
-        if (userService.login(dbUserModel, password) == 1) {
+        if (userService.login(dbUser, password) == 1) {
             return ResultErrorCode(3)
         }
 
-        session.setAttribute("username", dbUserModel.username)
-        session.setAttribute("id", dbUserModel.id)
+        session.setAttribute("username", dbUser.username)
+        session.setAttribute("id", dbUser.id)
         session.setAttribute("isLogin", true.toString())
-        CookieTool.addCookie("username", dbUserModel.username, response)
+        CookieTool.addCookie("username", dbUser.username, response)
 
         return ResultErrorCode(0)
     }
