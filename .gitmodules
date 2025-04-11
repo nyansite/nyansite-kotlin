@@ -1,0 +1,6 @@
+[submodule "submodules/sensitive-words"]
+	path = submodules/sensitive-words
+	url = https://github.com/nyansite/sensitive-words
+[submodule "src/main/resources/static/sensitive-words"]
+	path = src/main/resources/static/sensitive-words
+	url = https://github.com/nyansite/sensitive-words

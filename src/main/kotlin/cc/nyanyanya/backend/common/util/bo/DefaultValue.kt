@@ -1,10 +1,12 @@
 package cc.nyanyanya.backend.common.util.bo
 
 import org.apache.commons.lang3.time.DateUtils
+import org.springframework.stereotype.Component
 import java.sql.Timestamp
 import java.util.*
 
 
+@Component
 class DefaultValue {
     val DEFAULT_UUID = UUID(0L, 0L)
     val DEFAULT_DATE: Date = DateUtils.parseDate("0001-01-01", "yyyy-MM-dd")

@@ -1,18 +1,19 @@
 package cc.nyanyanya.backend.common.persistence.model
 
+import cc.nyanyanya.backend.common.util.GlobalVariables
 import cc.nyanyanya.backend.common.util.bo.DefaultValue
 import com.baomidou.mybatisplus.annotation.IdType
-import com.baomidou.mybatisplus.annotation.TableId
 import com.baomidou.mybatisplus.annotation.TableField
+import com.baomidou.mybatisplus.annotation.TableId
 import com.baomidou.mybatisplus.annotation.TableName
+import kotlinx.coroutines.*
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.toEntity
+import java.nio.charset.Charset
 import java.sql.Timestamp
 import java.util.*
-import kotlinx.coroutines.*
-import org.springframework.http.ResponseEntity
-import java.nio.charset.Charset
 
 @TableName(schema = "user_management_", value = "user_")
 data class UserModel(
@@ -20,43 +21,43 @@ data class UserModel(
         value = "id_",
         type = IdType.INPUT,
     )
-    var id: UUID,
+    var id: UUID = ID_DEFAULT,
 
     @TableField(value = "username_")
-    var username: String,
+    var username: String = USERNAME_DEFAULT,
 
     @TableField(value = "nickname_")
-    var nickName: String,
+    var nickName: String = NICKNAME_DEFAULT,
 
     @TableField(value = "phone_")
-    var phone: String,
+    var phone: String = PHONE_DEFAULT,
 
     @TableField(value = "gender_id_")
-    var genderId: Short,
+    var genderId: Short = GENDER_ID_DEFAULT,
 
     @TableField(value = "email_")
-    var email: String,
+    var email: String = EMAIL_DEFAULT,
 
     @TableField(value = "avatar_path_")
-    var avatarPath: String = "  ",
+    var avatarPath: String = AVATAR_PATH_DEFAULT,
 
     @TableField(value = "birthday_")
-    var birthday: Date,
+    var birthday: Date = BIRTHDAY_DEFAULT,
 
     @TableField(value = "level_id_")
-    var levelId: Short,
+    var levelId: Short = LEVEL_ID_DEFAULT,
 
     @TableField(value = "signup_time_")
-    var signupTime: Timestamp,
+    var signupTime: Timestamp = SIGNUP_TIME_DEFAULT,
 
     @TableField(value = "password_")
-    var password: String,
+    var password: String = PASSWORD_DEFAULT,
 
     @TableField(value = "phone_modify_time_")
-    var phoneModifyTime: Timestamp,
+    var phoneModifyTime: Timestamp = PHONE_MODIFY_TIME_DEFAULT,
 
     @TableField(value = "email_modify_time_")
-    var emailModifyTime: Timestamp,
+    var emailModifyTime: Timestamp = EMAIL_MODIFY_TIME_DEFAULT,
 ) {
     companion object {
         val ID_DEFAULT = DefaultValue().DEFAULT_UUID
@@ -73,11 +74,6 @@ data class UserModel(
         val PHONE_MODIFY_TIME_DEFAULT = DefaultValue().DEFAULT_TIMESTAMP
         val EMAIL_MODIFY_TIME_DEFAULT = DefaultValue().DEFAULT_TIMESTAMP
 
-
-        fun verifyUsernameFormat(username: String): Boolean {
-            val regex = Regex("^[A-Za-z0-9_]{6,20}$")
-            return regex.matches(username)
-        }
 
         fun verifyEmailFormat(email: String): Boolean {
             val regexConditionOne = Regex("(?=.{1,253}\$)" +
@@ -102,33 +98,60 @@ data class UserModel(
             return regex.matches(phone)
         }
 
-        fun verifyPasswordFormat(password: String): Boolean {
-            val regex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[A-Za-z0-9_]{6,20}$")
-            return regex.matches(password)
-        }
-
         fun verifyAvatarFormat(avatarEncodeString: String): Boolean {
             val avatarFileExtensionList = "jpg|gif|jpeg|png|gif|bmp|webp|svg|tiff|ico|jfif|tif"
             val regex = Regex("^data:image/(?:${avatarFileExtensionList});base64,([A-Za-z0-9+/=]+)$")
             return regex.matches(avatarEncodeString)
         }
+
+        fun haveSensitiveWords(strToTest: String): Boolean {
+            val SENSITIVE_WORDS = GlobalVariables().SENSITIVE_WORDS
+
+            SENSITIVE_WORDS.forEach() { it ->
+                it.value.forEach() { word ->
+                    if (strToTest.contains(word, false)) {
+                        return true
+                    }
+                }
+            }
+            return false
+        }
+
+        fun verifyUsernameFormat(username: String): Boolean {
+            val regex = Regex("^[A-Za-z0-9_]{6,20}$")
+
+            val notHaveSensitiveWords = !haveSensitiveWords(username)
+            val inRightFormat = regex.matches(username)
+            return notHaveSensitiveWords && inRightFormat
+        }
+
+        fun verifyNicknameFormat(nickname: String): Boolean {
+            val notHaveSensitiveWords = !haveSensitiveWords(nickname)
+            val inRightFormat = nickname.length in 1..64
+            return notHaveSensitiveWords && inRightFormat
+        }
+
+        fun verifyPasswordFormat(password: String): Boolean {
+            val regex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[A-Za-z0-9_]{6,20}$")
+            return regex.matches(password)
+        }
     }
 
-    constructor() : this(
-        id = ID_DEFAULT,
-        username = USERNAME_DEFAULT,
-        nickName = NICKNAME_DEFAULT,
-        phone = PHONE_DEFAULT,
-        genderId = GENDER_ID_DEFAULT,
-        email = EMAIL_DEFAULT,
-        avatarPath = AVATAR_PATH_DEFAULT,
-        birthday = BIRTHDAY_DEFAULT,
-        levelId = LEVEL_ID_DEFAULT,
-        signupTime = SIGNUP_TIME_DEFAULT,
-        password = PASSWORD_DEFAULT,
-        phoneModifyTime = PHONE_MODIFY_TIME_DEFAULT,
-        emailModifyTime = EMAIL_MODIFY_TIME_DEFAULT,
-    )
+//    constructor() : this(
+//        id = ID_DEFAULT,
+//        username = USERNAME_DEFAULT,
+//        nickName = NICKNAME_DEFAULT,
+//        phone = PHONE_DEFAULT,
+//        genderId = GENDER_ID_DEFAULT,
+//        email = EMAIL_DEFAULT,
+//        avatarPath = AVATAR_PATH_DEFAULT,
+//        birthday = BIRTHDAY_DEFAULT,
+//        levelId = LEVEL_ID_DEFAULT,
+//        signupTime = SIGNUP_TIME_DEFAULT,
+//        password = PASSWORD_DEFAULT,
+//        phoneModifyTime = PHONE_MODIFY_TIME_DEFAULT,
+//        emailModifyTime = EMAIL_MODIFY_TIME_DEFAULT,
+//    )
 
     fun genAvatarFilePath(
         avatarEncodeString: String

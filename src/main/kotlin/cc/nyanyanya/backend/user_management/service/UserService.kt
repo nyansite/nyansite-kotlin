@@ -12,7 +12,6 @@ import java.util.*
 @Service
 class UserService(
     private val userRepo: UserRepo,
-    private val fileRepo: FileRepo,
     private val genderRepo: GenderRepo,
     private val fanGroupService: FanGroupService,
     private val fanService: FanService,
@@ -78,7 +77,7 @@ class UserService(
     fun removeUser(
         user: UserModel,
     ): Boolean {
-        fileRepo.deleteFile(user.avatarPath)
+        FileRepo.deleteFile(user.avatarPath)
         val resultRemoveFanGroup = fanGroupService.removeAllFanGroup(user.id)
         val resultFan = fanService.removeAllFans(user.id)
         val homepagePrivacySetting = homepagePrivacySettingRepo.selectByUserId(user.id)
@@ -137,11 +136,11 @@ class UserService(
         if (avatarBase64String == "") return
         val filePath = user.genAvatarFilePath(avatarEncodeString)
         if (filePath == "") return
-        fileRepo.writeFileToBase64String(filePath, avatarBase64String)
+        FileRepo.writeFileToBase64String(filePath, avatarBase64String)
     }
 
     fun loadAvatar(avatarPath: String): String {
-        val avatarBase64String = fileRepo.readFileToBase64String(avatarPath)
+        val avatarBase64String = FileRepo.readFileToBase64String(avatarPath)
         val fileExtension = FilenameUtils.getExtension(avatarPath)
         val encodeString = "data:image/${fileExtension};base64,${avatarBase64String}"
 
