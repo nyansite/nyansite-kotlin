@@ -4,6 +4,26 @@ spring:
     username: @spring.datasource.username@
     password: @spring.datasource.password@
     driver-class-name: @spring.datasource.driver-class-name@
+  mail:
+    host: @spring.mail.host@
+    port: @spring.mail.port@
+    username: @spring.mail.username@
+    password: @spring.mail.password@
+    properties:
+      transport:
+        protocol: smtp
+      smtp:
+        ssl:
+          enable: true
+      mail:
+        smtp:
+          starttls:
+            enable: true
+            required: true
+          auth: true
+          ssl:
+            trust: @spring.mail.properties.mail.smtp.ssl.trust@
+
 
 mybatis-plus:
   configuration:
@@ -16,6 +36,7 @@ server:
     session:
       timeout: 60m
       cookie:
-        name: SESSION_COOKIE
+        name: cookieId
         http-only: true
         secure: true
+        same-site: lax

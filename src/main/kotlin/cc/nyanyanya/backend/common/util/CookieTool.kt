@@ -14,10 +14,11 @@ object CookieTool {
         return null
     }
 
-    fun addCookie(cookie: String, name: String, response: HttpServletResponse) {
-        val logonStateCookie = Cookie(cookie, name)
-        logonStateCookie.maxAge = 30 * 24 * 60 * 60 // 30 days
-        logonStateCookie.secure = true
-        response.addCookie(logonStateCookie)
+    fun addCookie(cookieKey: String, name: String, response: HttpServletResponse) {
+        val cookie = Cookie(cookieKey, name)
+        cookie.maxAge = 30 * 24 * 60 * 60 // 30 days
+        cookie.secure = true
+        cookie.setAttribute("sameSite", "Lax")
+        response.addCookie(cookie)
     }
 }

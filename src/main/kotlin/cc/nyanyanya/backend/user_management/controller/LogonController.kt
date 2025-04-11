@@ -20,32 +20,29 @@ class LogonController(
     fun login(
         @RequestParam username: String,
         @RequestParam email: String,
-        @RequestParam phone: String,
         @RequestParam password: String,
         session: HttpSession,
         response: HttpServletResponse
     ): ResultErrorCode {
-        val isLogin = (session.getAttribute("isLogin") as? String ?: "false").toBoolean()
+        val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
         if (isLogin) {
             return ResultErrorCode(1)
         }
 
-        val isJustOneNull = LogicTool.isJustOneNotNull(
+        val isJustOneNotNull = LogicTool.isJustOneNotNull(
             listOf(
                 username,
                 email,
-                phone
             ),
             listOf(
                 "",
                 "",
-                "",
             )
         )
-        if (!isJustOneNull.isTrue) {
+        if (!isJustOneNotNull.isTrue) {
             return ResultErrorCode(2)
         }
-        val notNullArgIndex = isJustOneNull.trueIndex
+        val notNullArgIndex = isJustOneNotNull.trueIndex
 
         var dbUser = UserModel()
         when (notNullArgIndex) {
@@ -57,11 +54,6 @@ class LogonController(
             1 -> {
                 // email
                 dbUser = userService.fetchUserByEmail(email)
-            }
-
-            2 -> {
-                // phone
-                dbUser = userService.fetchUserByPhone(phone)
             }
         }
 
@@ -75,7 +67,7 @@ class LogonController(
 
         session.setAttribute("username", dbUser.username)
         session.setAttribute("id", dbUser.id)
-        session.setAttribute("isLogin", true.toString())
+        session.setAttribute("isLogin", true)
         CookieTool.addCookie("username", dbUser.username, response)
 
         return ResultErrorCode(0)
@@ -85,7 +77,7 @@ class LogonController(
     fun logout(
         session: HttpSession,
     ): ResultErrorCode {
-        val isLogin = (session.getAttribute("isLogin") as? String ?: "false").toBoolean()
+        val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
         if (!isLogin) {
             return ResultErrorCode(1)
         }

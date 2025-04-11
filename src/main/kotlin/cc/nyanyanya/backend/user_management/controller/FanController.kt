@@ -24,7 +24,7 @@ class FanController(
         @RequestParam(value = "group_name") groupName: String,
         session: HttpSession
     ): ResultErrorCode {
-        val isLogin = (session.getAttribute("isLogin") as? String ?: "false").toBoolean()
+        val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
         if (!isLogin) {
             return ResultErrorCode(3)
         }
@@ -49,7 +49,7 @@ class FanController(
         @RequestParam id: String,
         session: HttpSession
     ): ResultErrorCode {
-        val isLogin = (session.getAttribute("isLogin") as? String ?: "false").toBoolean()
+        val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
         if (!isLogin) {
             return ResultErrorCode(3)
         }
@@ -69,7 +69,7 @@ class FanController(
         @RequestParam(value = "group_name") groupName: String,
         session: HttpSession
     ): ResultErrorCode {
-        val isLogin = (session.getAttribute("isLogin") as? String ?: "false").toBoolean()
+        val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
         if (!isLogin) {
             return ResultErrorCode(2)
         }
@@ -89,7 +89,7 @@ class FanController(
         @RequestParam(value = "group_name") groupName: String,
         session: HttpSession
     ): ResultErrorCode {
-        val isLogin = (session.getAttribute("isLogin") as? String ?: "false").toBoolean()
+        val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
         if (!isLogin) {
             return ResultErrorCode(3)
         }

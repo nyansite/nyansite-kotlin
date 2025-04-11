@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName
 @TableName(schema = "user_management_", value = "level_")
 class LevelModel(
     @TableId(value = "id_", type = IdType.AUTO)
-    var id: Short,
+    var id: Short?,
 
     @TableField(value = "number_")
     var number: Short,
@@ -18,7 +18,7 @@ class LevelModel(
     var name: String,
 ) {
     companion object {
-        val ID_DEFAULT = DefaultValue.DEFAULT_SHORT
+        const val ID_DEFAULT = DefaultValue.DEFAULT_SHORT
         const val NUMBER_DEFAULT = DefaultValue.DEFAULT_SHORT
         const val NAME_DEFAULT = ""
     }

@@ -4,13 +4,16 @@ package cc.nyanyanya.backend.user_management.controller
 import cc.nyanyanya.backend.common.persistence.model.FanModel
 import cc.nyanyanya.backend.common.persistence.model.UserModel
 import cc.nyanyanya.backend.common.util.LogicTool
+import cc.nyanyanya.backend.common.util.VerificationCode
 import cc.nyanyanya.backend.common.util.bo.DefaultValue
 import cc.nyanyanya.backend.common.util.bo.ResultErrorCode
 import cc.nyanyanya.backend.user_management.entity.FollowList
+import cc.nyanyanya.backend.user_management.service.EmailService
 import cc.nyanyanya.backend.user_management.service.FanService
 import cc.nyanyanya.backend.user_management.service.FollowService
 import cc.nyanyanya.backend.user_management.service.UserService
 import jakarta.servlet.http.HttpSession
+import org.apache.commons.lang3.time.DateUtils
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -19,30 +22,28 @@ import java.util.*
 class UserController(
     private val userService: UserService,
     private val followService: FollowService,
-    private val fanService: FanService
+    private val fanService: FanService,
+    private val emailService: EmailService,
 ) {
     @PostMapping("/verify-account")
     fun logout(
         @RequestParam username: String,
         @RequestParam email: String,
-        @RequestParam phone: String,
     ): ResultErrorCode {
-        val isJustOneNull = LogicTool.isJustOneNotNull(
+        val isJustOneNotNull = LogicTool.isJustOneNotNull(
             listOf(
                 username,
                 email,
-                phone
             ),
             listOf(
                 "",
                 "",
-                "",
             )
         )
-        if (!isJustOneNull.isTrue) {
+        if (!isJustOneNotNull.isTrue) {
             return ResultErrorCode(1)
         }
-        val notNullArgIndex = isJustOneNull.trueIndex
+        val notNullArgIndex = isJustOneNotNull.trueIndex
 
         var dbUser = UserModel()
         when (notNullArgIndex) {
@@ -54,11 +55,6 @@ class UserController(
             1 -> {
                 // email
                 dbUser = userService.fetchUserByEmail(email)
-            }
-
-            2 -> {
-                // phone
-                dbUser = userService.fetchUserByPhone(phone)
             }
         }
 
@@ -99,9 +95,8 @@ class UserController(
             var id = UserModel.ID_DEFAULT
             var username = UserModel.USERNAME_DEFAULT
             var name = UserModel.NICKNAME_DEFAULT
-            var phone = UserModel.PHONE_DEFAULT
             var gender = UserModel.GENDER_ID_DEFAULT
-            var email = UserModel.EMAIL_DEFAULT
+            var mail = UserModel.EMAIL_DEFAULT
             var level = UserModel.LEVEL_ID_DEFAULT
             var avatar = ""
             var birthday = UserModel.BIRTHDAY_DEFAULT
@@ -110,7 +105,7 @@ class UserController(
             var error = DefaultValue.DEFAULT_BYTE
         }
 
-        val isLogin = (session.getAttribute("isLogin") as? String ?: "false").toBoolean()
+        val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
         if (!isLogin) {
             userInfo.error = 1.toByte()
 
@@ -123,9 +118,8 @@ class UserController(
         userInfo.id = dbUser.id
         userInfo.username = dbUser.username
         userInfo.name = dbUser.nickName
-        userInfo.phone = dbUser.phone
         userInfo.gender = dbUser.genderId
-        userInfo.email = dbUser.email
+        userInfo.mail = dbUser.email
         userInfo.level = dbUser.levelId
         // TODO: localdebug
 //        userInfo.avatar = userService.readAvatar(dbUser.avatarPath)
@@ -153,7 +147,7 @@ class UserController(
             return usernameInfo
         }
 
-        val isLogin = (session.getAttribute("isLogin") as? String ?: "false").toBoolean()
+        val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
         if (!isLogin) {
             usernameInfo.error = 4.toByte()
 
@@ -184,7 +178,6 @@ class UserController(
         return usernameInfo
     }
 
-
     @PostMapping("/get-user-info")
     fun getUserInfo(
         @RequestParam id: String,
@@ -214,9 +207,8 @@ class UserController(
         val otherUserInfo = object {
             var username = UserModel.USERNAME_DEFAULT
             var name = UserModel.NICKNAME_DEFAULT
-            var phone = UserModel.PHONE_DEFAULT
             var gender = UserModel.GENDER_ID_DEFAULT
-            var email = UserModel.EMAIL_DEFAULT
+            var mail = UserModel.EMAIL_DEFAULT
             var level = UserModel.LEVEL_ID_DEFAULT
             var avatar = ""
             var birthday = UserModel.BIRTHDAY_DEFAULT
@@ -231,7 +223,7 @@ class UserController(
             return otherUserInfo
         }
 
-        val isLogin = (session.getAttribute("isLogin") as? String ?: "false").toBoolean()
+        val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
         if (!isLogin) {
             otherUserInfo.error = 4.toByte()
 
@@ -257,9 +249,8 @@ class UserController(
 
         otherUserInfo.username = dbOtherUser.username
         otherUserInfo.name = dbOtherUser.nickName
-        otherUserInfo.phone = dbOtherUser.phone
         otherUserInfo.gender = dbOtherUser.genderId
-        otherUserInfo.email = dbOtherUser.email
+        otherUserInfo.mail = dbOtherUser.email
         otherUserInfo.level = dbOtherUser.levelId
         // TODO: localdebug
 //        otherUserInfo.avatar = userService.readAvatar(dbOtherUser.avatarPath)
@@ -268,5 +259,299 @@ class UserController(
         otherUserInfo.fans = fansInfoTransformer(fanService.fetchAllFans(dbOtherUser.id))
         otherUserInfo.error = 0.toByte()
         return otherUserInfo
+    }
+
+    @PostMapping("/change-passwd")
+    fun changePasswd(
+        @RequestParam email: String,
+        @RequestParam password: String,
+        @RequestParam code: String,
+        session: HttpSession,
+    ): Any {
+        if (email == "") {
+            return ResultErrorCode(3)
+        }
+
+        if (password == "") {
+            return ResultErrorCode(6)
+        }
+
+        val sessionEmailToVerify = session.getAttribute("emailToVerify") as? String ?: UserModel.EMAIL_DEFAULT
+        if (email != sessionEmailToVerify) {
+            return ResultErrorCode(4)
+        }
+
+        val sessionLastEmailCodeSendTime = session.getAttribute("lastEmailCodeSendTime") as? Long
+            ?: DefaultValue().DEFAULT_TIMESTAMP.time
+        if (System.currentTimeMillis() - sessionLastEmailCodeSendTime > VerificationCode.EXPIRATION_DURING) {
+            return ResultErrorCode(5)
+        }
+
+        val sessionVerificationCode = session.getAttribute("verificationCode") as? String
+            ?: ""
+        if (code != sessionVerificationCode) {
+            return ResultErrorCode(2)
+        }
+
+        if (!UserModel.verifyPasswordFormat(password)) {
+            return ResultErrorCode(7)
+        }
+
+        var dbUser = UserModel()
+        dbUser = userService.fetchUserByEmail(email)
+        if (dbUser == UserModel()) {
+            return ResultErrorCode(1)
+        }
+
+        dbUser.password = password
+        userService.modifyUser(dbUser)
+        return ResultErrorCode(0)
+    }
+
+    @PostMapping("/get-passwd")
+    fun getPasswd(
+        @RequestParam email: String,
+        @RequestParam password: String,
+        @RequestParam code: String,
+        session: HttpSession,
+    ): Any {
+        if (email == "") {
+            return ResultErrorCode(3)
+        }
+
+        val sessionEmailToVerify = session.getAttribute("emailToVerify") as? String ?: UserModel.EMAIL_DEFAULT
+        if (email != sessionEmailToVerify) {
+            return ResultErrorCode(4)
+        }
+
+        val lastEmailCodeSendTime = session.getAttribute("lastEmailCodeSendTime") as? Long
+            ?: DefaultValue().DEFAULT_TIMESTAMP.time
+        if (System.currentTimeMillis() - lastEmailCodeSendTime > VerificationCode.EXPIRATION_DURING) {
+            return ResultErrorCode(5)
+        }
+
+        val sessionVerificationCode = session.getAttribute("verificationCode") as? String
+            ?: ""
+        if (code != sessionVerificationCode) {
+            return ResultErrorCode(2)
+        }
+
+        var dbUser = UserModel()
+        dbUser = userService.fetchUserByEmail(email)
+        if (dbUser == UserModel()) {
+            return ResultErrorCode(1)
+        }
+
+        emailService.sendPasswordToEmail(dbUser)
+        return ResultErrorCode(0)
+    }
+
+    @PostMapping("/dropout")
+    fun dropout(
+        @RequestParam email: String,
+        @RequestParam code: String,
+        session: HttpSession,
+    ): Any {
+        if (email == "") {
+            return ResultErrorCode(3)
+        }
+
+        val sessionEmailToVerify = session.getAttribute("emailToVerify") as? String ?: UserModel.EMAIL_DEFAULT
+        if (email != sessionEmailToVerify) {
+            return ResultErrorCode(4)
+        }
+
+        val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
+        if (!isLogin) {
+            return ResultErrorCode(1)
+        }
+
+        val lastEmailCodeSendTime = session.getAttribute("lastEmailCodeSendTime") as? Long
+            ?: DefaultValue().DEFAULT_TIMESTAMP.time
+        if (System.currentTimeMillis() - lastEmailCodeSendTime > VerificationCode.EXPIRATION_DURING) {
+            return ResultErrorCode(5)
+        }
+
+        val sessionVerificationCode = session.getAttribute("verificationCode") as? String
+            ?: ""
+        if (code != sessionVerificationCode) {
+            return ResultErrorCode(2)
+        }
+
+        var dbUser = UserModel()
+        dbUser = userService.fetchUserByEmail(email)
+        userService.removeUser(dbUser)
+        return ResultErrorCode(0)
+    }
+
+    @PostMapping("/set-own-info")
+    fun setOwnInfo(
+        @RequestParam username: String,
+        @RequestParam name: String,
+        @RequestParam gender: String,
+        @RequestParam(name = "original_mail") originalMail: String,
+        @RequestParam mail: String,
+        @RequestParam avatar: String,
+        @RequestParam birthday: String,
+        @RequestParam code: String,
+        @RequestParam(name = "original_code") originalCode: String,
+        session: HttpSession,
+    ): Any {
+        var dbUser = UserModel()
+
+        if (mail != "" && originalMail == "") {
+            return ResultErrorCode(3)
+        }
+
+        if (username == "" && name == "" && gender == "" && mail == "" && avatar == "" && birthday == "") {
+            return ResultErrorCode(2)
+        }
+
+        val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
+        if (!isLogin) {
+            return ResultErrorCode(1)
+        }
+
+        val sessionId = session.getAttribute("id") as? UUID ?: UserModel.ID_DEFAULT
+        dbUser = userService.fetchUserById(sessionId)
+        if (mail != "" && dbUser.isChangeEmailTooOften()) {
+            return ResultErrorCode(12)
+        }
+
+        val sessionLastOriginalEmailCodeSendTime = session.getAttribute("lastOriginalEmailCodeSendTime") as? Long
+            ?: DefaultValue().DEFAULT_TIMESTAMP.time
+        if (mail != "" &&
+                System.currentTimeMillis() - sessionLastOriginalEmailCodeSendTime > VerificationCode.EXPIRATION_DURING) {
+            return ResultErrorCode(7)
+        }
+
+        val sessionLastEmailCodeSendTime = session.getAttribute("lastEmailCodeSendTime") as? Long
+            ?: DefaultValue().DEFAULT_TIMESTAMP.time
+        if (mail != "" &&
+                System.currentTimeMillis() - sessionLastEmailCodeSendTime > VerificationCode.EXPIRATION_DURING) {
+            return ResultErrorCode(9)
+        }
+
+        val sessionOriginalEmailToVerify = session.getAttribute("originalEmailToVerify") as? String
+            ?: UserModel.EMAIL_DEFAULT
+        if (mail != "" && originalMail != sessionOriginalEmailToVerify || dbUser.email != originalMail) {
+            return ResultErrorCode(4)
+        }
+
+        val sessionEmailToVerify = session.getAttribute("emailToVerify") as? String ?: UserModel.EMAIL_DEFAULT
+        if (mail != "" && mail != sessionEmailToVerify) {
+            return ResultErrorCode(5)
+        }
+
+        val sessionOriginalVerificationCode = session.getAttribute("originalVerificationCode") as? String ?: ""
+        if (mail != "" && originalCode != sessionOriginalVerificationCode) {
+            return ResultErrorCode(6)
+        }
+
+        val sessionVerificationCode = session.getAttribute("verificationCode") as? String ?: ""
+        if (mail != "" && code != sessionVerificationCode) {
+            return ResultErrorCode(8)
+        }
+
+        val isFormatCorrect =
+            ((username == "") and (username != "" && UserModel.verifyUsernameFormat(username))) &&
+            ((mail == "") and (mail != "" && UserModel.verifyEmailFormat(mail))) &&
+            ((avatar == "") and (avatar != "" && UserModel.verifyAvatarFormat(avatar)))
+        if (!isFormatCorrect) {
+            return ResultErrorCode(10)
+        }
+
+        val isRegistered =
+            (username != "" && userService.fetchUserByUsername(username) == UserModel()) ||
+                    (mail != "" && userService.fetchUserByEmail(mail) == UserModel()) ||
+                    (name != "" && userService.fetchUserByNickname(name) == UserModel())
+        if (isRegistered) {
+            return ResultErrorCode(11)
+        }
+
+        if (username != "") { dbUser.username = username }
+        if (name != "") { dbUser.nickName = name }
+        if (gender != "") { userService.setUserGenderId(dbUser, gender) }
+        if (mail != "") { dbUser.email = mail }
+        if (avatar != "") { userService.saveAvatar(dbUser, avatar)}
+        if (birthday != "") { dbUser.birthday = DateUtils.parseDate(birthday, "yyyy-MM-dd") }
+        userService.modifyUser(dbUser)
+        return ResultErrorCode(0)
+    }
+
+    @PostMapping("/signup")
+    fun signup(
+        @RequestParam username: String,
+        @RequestParam mail: String,
+        @RequestParam password: String,
+        @RequestParam code: String,
+        session: HttpSession,
+    ): Any {
+        var dbUser = UserModel()
+
+        val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
+        if (isLogin) {
+            return ResultErrorCode(1)
+        }
+
+        if (!UserModel.verifyPasswordFormat(password)) {
+            return ResultErrorCode(3)
+        }
+
+        val isJustOneNotNull = LogicTool.isJustOneNotNull(
+            listOf(
+                username,
+                mail,
+            ),
+            listOf(
+                "",
+                "",
+            )
+        )
+        if (!isJustOneNotNull.isTrue) {
+            return ResultErrorCode(2)
+        }
+        val notNullArgIndex = isJustOneNotNull.trueIndex
+
+        val sessionLastEmailCodeSendTime = session.getAttribute("lastEmailCodeSendTime") as? Long
+            ?: DefaultValue().DEFAULT_TIMESTAMP.time
+        if (mail != "" &&
+                System.currentTimeMillis() - sessionLastEmailCodeSendTime > VerificationCode.EXPIRATION_DURING) {
+            return ResultErrorCode(6)
+        }
+
+        val sessionEmailToVerify = session.getAttribute("emailToVerify") as? String ?: UserModel.EMAIL_DEFAULT
+        if (mail != "" && mail != sessionEmailToVerify) {
+            return ResultErrorCode(5)
+        }
+
+        val sessionVerificationCode = session.getAttribute("verificationCode") as? String ?: ""
+        if (code != sessionVerificationCode) {
+            return ResultErrorCode(5)
+        }
+
+        when (notNullArgIndex) {
+            0 -> {
+                // username
+                val isUsernameHaveRightFormat = UserModel.verifyUsernameFormat(username)
+                dbUser = userService.fetchUserByUsername(username)
+                if (!isUsernameHaveRightFormat || dbUser != UserModel()) {
+                    return ResultErrorCode(2)
+                }
+                userService.createUserWithUsername(username, password)
+            }
+
+            1 -> {
+                // mail
+                val isEmailHaveRightFormat = UserModel.verifyEmailFormat(mail)
+                dbUser = userService.fetchUserByEmail(mail)
+                if (!isEmailHaveRightFormat || dbUser != UserModel()) {
+                    return ResultErrorCode(2)
+                }
+                userService.createUserWithEmail(mail, password)
+            }
+        }
+
+        return ResultErrorCode(0)
     }
 }

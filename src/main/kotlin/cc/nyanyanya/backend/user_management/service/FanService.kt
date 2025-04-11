@@ -32,6 +32,15 @@ class FanService(
         return success
     }
 
+    fun removeAllFans(userId: UUID): Boolean {
+        val allFansList = fanRepo.getAllFans(userId)
+        var deleteNumber = 0
+        allFansList.forEach {
+            if (fanRepo.deleteByUserId(it.userId, userId) == 1) deleteNumber++
+        }
+        return if (deleteNumber == allFansList.size) true else false
+    }
+
     fun addFan(
         fanUsername: String,
         followUserId: UUID,

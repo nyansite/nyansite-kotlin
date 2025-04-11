@@ -9,24 +9,22 @@ import java.util.*
 
 @Repository
 class HomepagePrivacySettingRepo(private val homepagePrivacySettingMapper: HomepagePrivacySettingMapper) {
-    fun updateByUserId(
-        userId: UUID,
-        isDisplayPhone: String,
-        isDisplayMail: String,
-        isDisplayBirthday: String,
-        isDisplayFollowsAndFans: String,
-    ): Int {
-        val dbHomepagePrivacySetting = selectByUserId(userId)
-        if (isDisplayPhone != "") {dbHomepagePrivacySetting.isDisplayPhone = isDisplayPhone.toBoolean()}
-        if (isDisplayMail != "") {dbHomepagePrivacySetting.isDisplayMail = isDisplayMail.toBoolean()}
-        if (isDisplayBirthday != "") {dbHomepagePrivacySetting.isDisplayBirthday = isDisplayBirthday.toBoolean()}
-        if (isDisplayFollowsAndFans != "") {
-            dbHomepagePrivacySetting.isDisplayFollowsAndFans = isDisplayFollowsAndFans.toBoolean()
-        }
+    fun insert(homepagePrivacySetting: HomepagePrivacySettingModel): Int {
+        val result = homepagePrivacySettingMapper.insert(homepagePrivacySetting)
+        return result
+    }
 
+    fun deleteById(id: UUID): Int {
+        val result = homepagePrivacySettingMapper.deleteById(id)
+        return result
+    }
+
+    fun update(
+        homepagePrivacySetting: HomepagePrivacySettingModel,
+    ): Int {
         val queryWrapper = KtUpdateWrapper(HomepagePrivacySettingModel::class.java)
-            .eq(HomepagePrivacySettingModel::userId, userId)
-        val result = homepagePrivacySettingMapper.update(dbHomepagePrivacySetting, queryWrapper)
+            .eq(HomepagePrivacySettingModel::id, homepagePrivacySetting.id)
+        val result = homepagePrivacySettingMapper.update(homepagePrivacySetting, queryWrapper)
         return result
     }
 

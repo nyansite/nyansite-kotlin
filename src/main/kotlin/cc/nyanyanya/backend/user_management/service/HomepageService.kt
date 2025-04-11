@@ -22,13 +22,15 @@ class HomepageService(
         isDisplayBirthday: String,
         isDisplayFollowsAndFans: String,
     ): Boolean {
-        val result = homepagePrivacySettingRepo.updateByUserId(
-            userId,
-            isDisplayPhone,
-            isDisplayMail,
-            isDisplayBirthday,
-            isDisplayFollowsAndFans,
-        )
+        val dbHomepagePrivacySetting = homepagePrivacySettingRepo.selectByUserId(userId)
+        if (isDisplayPhone != "") {dbHomepagePrivacySetting.isDisplayPhone = isDisplayPhone.toBoolean()}
+        if (isDisplayMail != "") {dbHomepagePrivacySetting.isDisplayMail = isDisplayMail.toBoolean()}
+        if (isDisplayBirthday != "") {dbHomepagePrivacySetting.isDisplayBirthday = isDisplayBirthday.toBoolean()}
+        if (isDisplayFollowsAndFans != "") {
+            dbHomepagePrivacySetting.isDisplayFollowsAndFans = isDisplayFollowsAndFans.toBoolean()
+        }
+
+        val result = homepagePrivacySettingRepo.update(dbHomepagePrivacySetting)
         return if (result > 0) true else false
     }
 }

@@ -56,7 +56,9 @@ dependencies {
     developmentOnly("org.springframework.boot", "spring-boot-devtools", SPRING_BOOT_VERSION)
     runtimeOnly("org.postgresql:postgresql:42.7.5")
     providedRuntime("org.springframework.boot", "spring-boot-starter-tomcat", SPRING_BOOT_VERSION)
-    providedRuntime("org.springframework.boot", "spring-boot-starter-mail", SPRING_BOOT_VERSION)
+    implementation("org.springframework.boot", "spring-boot-starter-mail", SPRING_BOOT_VERSION)
+    implementation("org.springframework.boot", "spring-boot-starter-webflux", SPRING_BOOT_VERSION)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:$KOTLIN_VERSION")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.11.4")
 //    implementation(kotlin("stdlib-jdk8"))
@@ -91,6 +93,7 @@ if (buildVariant != BuildVariants.NATIVE.arg || buildVariant != BuildVariants.NA
 
 fun prepareConfig() {
     var databaseKeystorePropertiesFileName = "database-keystore.properties"
+    var emailKeystorePropertiesFileName = "email-keystore.properties"
 
     when (buildVariant) {
         BuildVariants.AOT.arg, BuildVariants.NATIVE.arg -> {
@@ -104,10 +107,19 @@ fun prepareConfig() {
     val databaseKeystorePropertiesFile = rootProject.file(databaseKeystorePropertiesFileName)
     val databaseKeystoreProperties = Properties()
     keystoreProperties.add(databaseKeystoreProperties)
+    val emailKeystorePropertiesFile = rootProject.file(emailKeystorePropertiesFileName)
+    val emailKeystoreProperties = Properties()
+    keystoreProperties.add(emailKeystoreProperties)
 
     try {
         FileInputStream(databaseKeystorePropertiesFile).use { inputStream ->
             databaseKeystoreProperties.load(inputStream)
+        }
+    } catch (ignored: Exception) {
+    }
+    try {
+        FileInputStream(emailKeystorePropertiesFile).use { inputStream ->
+            emailKeystoreProperties.load(inputStream)
         }
     } catch (ignored: Exception) {
     }
@@ -124,8 +136,8 @@ fun loadConfig() {
                 keystoreProperties.forEach { props ->
                     props.forEach { prop ->
                         if (prop.value != null) {
-                            filter { it.replace("@${prop.key.toString()}@", prop.value.toString()) }
-                            filter { it.replace("@project.${prop.key.toString()}@", prop.value.toString()) }
+                            filter { it.replace("@${prop.key}@", prop.value.toString()) }
+                            filter { it.replace("@project.${prop.key}@", prop.value.toString()) }
                         }
                     }
                 }

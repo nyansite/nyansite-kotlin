@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName
 @TableName(schema = "user_management_", value = "gender_")
 class GenderModel(
     @TableId(value = "id_", type = IdType.AUTO)
-    var id: Short,
+    var id: Short?,
 
     @TableField(value = "name_")
     var name: String,

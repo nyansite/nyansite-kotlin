@@ -20,14 +20,13 @@ class HomepageController(
         session: HttpSession,
     ): Any {
         val homepagePrivacySettingsInfo = object {
-            var is_display_phone = false
             var is_display_mail = false
             var is_display_birthday = false
             var is_display_fans = false
             var error = DefaultValue.DEFAULT_BYTE
         }
 
-        val isLogin = (session.getAttribute("isLogin") as? String ?: "false").toBoolean()
+        val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
         if (!isLogin) {
             homepagePrivacySettingsInfo.error = 1.toByte()
 
@@ -35,10 +34,9 @@ class HomepageController(
         }
 
         var dbHomepagePrivacySetting = HomepagePrivacySettingModel()
-        val sessionId = session.getAttribute("id") as? String ?: UserModel.ID_DEFAULT
-        dbHomepagePrivacySetting = homepageService.fetchHomepagePrivacySetting(UUID.fromString(sessionId.toString()))
+        val sessionId = session.getAttribute("id") as? UUID ?: UserModel.ID_DEFAULT
+        dbHomepagePrivacySetting = homepageService.fetchHomepagePrivacySetting(sessionId)
 
-        homepagePrivacySettingsInfo.is_display_phone = dbHomepagePrivacySetting.isDisplayPhone
         homepagePrivacySettingsInfo.is_display_mail = dbHomepagePrivacySetting.isDisplayMail
         homepagePrivacySettingsInfo.is_display_birthday = dbHomepagePrivacySetting.isDisplayBirthday
         homepagePrivacySettingsInfo.is_display_fans = dbHomepagePrivacySetting.isDisplayFollowsAndFans
@@ -48,28 +46,27 @@ class HomepageController(
 
     @PostMapping("/set-user-homepage-privacy-settings")
     fun setUserHomepagePrivacySettings(
-        @RequestParam is_display_phone: String,
-        @RequestParam is_display_mail: String,
-        @RequestParam is_display_birthday: String,
-        @RequestParam is_display_fans: String,
+        @RequestParam(name = "is_display_mail") isDisplayMail: String,
+        @RequestParam(name = "is_display_birthday") isDisplayBirthday: String,
+        @RequestParam(name = "is_display_fans") isDisplayFans: String,
         session: HttpSession,
     ): Any {
-        if (is_display_phone == "" && is_display_mail == "" && is_display_birthday == "" && is_display_fans == "") {
+        if (isDisplayMail == "" && isDisplayBirthday == "" && isDisplayFans == "") {
             return ResultErrorCode(2)
         }
 
-        val isLogin = (session.getAttribute("isLogin") as? String ?: "false").toBoolean()
+        val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
         if (!isLogin) {
             return ResultErrorCode(1)
         }
 
-        val sessionId = session.getAttribute("id") as? String ?: UserModel.ID_DEFAULT
+        val sessionId = session.getAttribute("id") as? UUID ?: UserModel.ID_DEFAULT
         homepageService.modifyHomepagePrivacySetting(
-            UUID.fromString(sessionId.toString()),
-            is_display_phone,
-            is_display_mail,
-            is_display_birthday,
-            is_display_fans,
+            sessionId,
+            "",
+            isDisplayMail,
+            isDisplayBirthday,
+            isDisplayFans,
         )
         return ResultErrorCode(0)
     }
