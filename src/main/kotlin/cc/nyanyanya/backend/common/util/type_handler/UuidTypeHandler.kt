@@ -11,8 +11,6 @@ import java.sql.SQLException
 import java.util.UUID
 
 
-
-
 @MappedTypes(UUID::class)
 @MappedJdbcTypes(JdbcType.VARCHAR)
 class UuidTypeHandler : BaseTypeHandler<UUID?>() {

@@ -1,5 +1,6 @@
 package cc.nyanyanya.backend.common.config
 
+import cc.nyanyanya.backend.common.util.type_handler.UuidTypeHandler
 import com.baomidou.mybatisplus.annotation.IEnum
 import com.baomidou.mybatisplus.core.MybatisParameterHandler
 import com.baomidou.mybatisplus.core.MybatisXMLLanguageDriver
@@ -170,6 +171,7 @@ class MyBatisNativeConfiguration {
             hints.reflection().registerType(JacksonTypeHandler::class.java, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS)
             hints.reflection()
                 .registerType(MybatisEnumTypeHandler::class.java, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS)
+            hints.reflection().registerType(UuidTypeHandler::class.java, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS)
         }
     }
 

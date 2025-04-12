@@ -2,11 +2,13 @@ package cc.nyanyanya.backend.common.persistence.model
 
 import cc.nyanyanya.backend.common.util.GlobalVariables
 import cc.nyanyanya.backend.common.util.bo.DefaultValue
+import cc.nyanyanya.backend.common.util.type_handler.UuidTypeHandler
 import com.baomidou.mybatisplus.annotation.IdType
 import com.baomidou.mybatisplus.annotation.TableField
 import com.baomidou.mybatisplus.annotation.TableId
 import com.baomidou.mybatisplus.annotation.TableName
 import kotlinx.coroutines.*
+import org.apache.ibatis.type.JdbcType
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestClient
@@ -21,6 +23,7 @@ data class UserModel(
         value = "id_",
         type = IdType.INPUT,
     )
+    @TableField(jdbcType = JdbcType.VARCHAR, typeHandler = UuidTypeHandler::class)
     var id: UUID = ID_DEFAULT,
 
     @TableField(value = "username_")

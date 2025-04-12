@@ -30,6 +30,8 @@ class HomepageService(
             dbHomepagePrivacySetting.isDisplayFollowsAndFans = isDisplayFollowsAndFans.toBoolean()
         }
 
+        dbHomepagePrivacySetting.userId = userId
+
         val result = homepagePrivacySettingRepo.update(dbHomepagePrivacySetting)
         return if (result > 0) true else false
     }

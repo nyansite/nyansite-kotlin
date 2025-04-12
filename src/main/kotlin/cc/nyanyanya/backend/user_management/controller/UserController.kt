@@ -122,7 +122,7 @@ class UserController(
         userInfo.mail = dbUser.email
         userInfo.level = dbUser.levelId
         // TODO: localdebug
-//        userInfo.avatar = userService.readAvatar(dbUser.avatarPath)
+        userInfo.avatar = userService.loadAvatar(dbUser.avatarPath)
         userInfo.birthday = dbUser.birthday
         userInfo.follows = followsInfoTransformer(followService.fetchAllFollows(dbUser.id))
         userInfo.fans = fansInfoTransformer(fanService.fetchAllFans(dbUser.id))
@@ -253,7 +253,7 @@ class UserController(
         otherUserInfo.mail = dbOtherUser.email
         otherUserInfo.level = dbOtherUser.levelId
         // TODO: localdebug
-//        otherUserInfo.avatar = userService.readAvatar(dbOtherUser.avatarPath)
+        otherUserInfo.avatar = userService.loadAvatar(dbOtherUser.avatarPath)
         otherUserInfo.birthday = dbOtherUser.birthday
         otherUserInfo.follows = followsInfoTransformer(followService.fetchAllFollows(dbOtherUser.id))
         otherUserInfo.fans = fansInfoTransformer(fanService.fetchAllFans(dbOtherUser.id))
@@ -434,7 +434,7 @@ class UserController(
 
         val sessionOriginalEmailToVerify = session.getAttribute("originalEmailToVerify") as? String
             ?: UserModel.EMAIL_DEFAULT
-        if (mail != "" && originalMail != sessionOriginalEmailToVerify || dbUser.email != originalMail) {
+        if (mail != "" && (originalMail != sessionOriginalEmailToVerify || dbUser.email != originalMail)) {
             return ResultErrorCode(4)
         }
 
@@ -454,18 +454,19 @@ class UserController(
         }
 
         val isFormatCorrect =
-            ((username == "") and (username != "" && UserModel.verifyUsernameFormat(username))) &&
-            ((mail == "") and (mail != "" && UserModel.verifyEmailFormat(mail))) &&
-            ((avatar == "") and (avatar != "" && UserModel.verifyAvatarFormat(avatar)))
+            ((username == "") || (username != "" && UserModel.verifyUsernameFormat(username))) &&
+            ((name == "") || (name != "" && UserModel.verifyNicknameFormat(name))) &&
+            ((mail == "") || (mail != "" && UserModel.verifyEmailFormat(mail))) &&
+            ((avatar == "") || (avatar != "" && UserModel.verifyAvatarFormat(avatar)))
         if (!isFormatCorrect) {
             return ResultErrorCode(10)
         }
 
-        val isRegistered =
+        val isNotRegistered =
             (username != "" && userService.fetchUserByUsername(username) == UserModel()) ||
-                    (mail != "" && userService.fetchUserByEmail(mail) == UserModel()) ||
-                    (name != "" && userService.fetchUserByNickname(name) == UserModel())
-        if (isRegistered) {
+                    (name != "" && userService.fetchUserByNickname(name) == UserModel()) ||
+                    (mail != "" && userService.fetchUserByEmail(mail) == UserModel())
+        if (!isNotRegistered) {
             return ResultErrorCode(11)
         }
 

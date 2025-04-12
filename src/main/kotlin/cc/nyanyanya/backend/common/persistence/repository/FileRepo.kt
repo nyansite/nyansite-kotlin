@@ -4,16 +4,16 @@ import okio.*
 import okio.ByteString.Companion.decodeBase64
 import okio.Path.Companion.toPath
 import org.springframework.stereotype.Repository
-import java.io.File
+import java.io.InputStream
 
 @Repository
 class FileRepo {
     companion object {
 
-        fun readFileAllLines(file: File): MutableList<String> {
+        fun readFileAllLines(inputStream: InputStream): MutableList<String> {
             val words = mutableListOf<String>()
 
-            val fileSource = file.source()
+            val fileSource = inputStream.source()
             val buffer = fileSource.buffer()
             do {
                 val line = buffer.readUtf8Line() ?: ""

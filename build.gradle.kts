@@ -39,6 +39,7 @@ java {
 
 repositories {
     mavenCentral()
+    maven{ url = uri("https://central.sonatype.com/repository/maven-snapshots/") }
 }
 
 dependencies {
@@ -51,7 +52,7 @@ dependencies {
     implementation("org.springframework.boot", "spring-boot-starter-web", SPRING_BOOT_VERSION)
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION")
-//    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4")
+    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4")
     implementation("org.springframework.boot", "spring-boot-starter-actuator", SPRING_BOOT_VERSION)
     developmentOnly("org.springframework.boot", "spring-boot-devtools", SPRING_BOOT_VERSION)
     runtimeOnly("org.postgresql:postgresql:42.7.5")
@@ -63,7 +64,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.11.4")
 //    implementation(kotlin("stdlib-jdk8"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION")
-    if (buildVariant != BuildVariants.NATIVE.arg || buildVariant != BuildVariants.NATIVE_TEST.arg) {
+    if (buildVariant != BuildVariants.NATIVE.arg && buildVariant != BuildVariants.NATIVE_TEST.arg) {
         testImplementation("org.springframework.boot", "spring-boot-starter-test", SPRING_BOOT_VERSION)
 //        testImplementation("org.mybatis.spring.boot", "mybatis-spring-boot-starter-test:3.0.4", SPRING_BOOT_VERSION)
     }
@@ -83,7 +84,7 @@ kotlin {
     }
 }
 
-if (buildVariant != BuildVariants.NATIVE.arg || buildVariant != BuildVariants.NATIVE_TEST.arg) {
+if (buildVariant != BuildVariants.NATIVE.arg && buildVariant != BuildVariants.NATIVE_TEST.arg) {
     tasks.withType<Test> {
         useJUnitPlatform()
     }
@@ -93,7 +94,7 @@ if (buildVariant != BuildVariants.NATIVE.arg || buildVariant != BuildVariants.NA
 
 fun prepareConfig() {
     var databaseKeystorePropertiesFileName = "database-keystore.properties"
-    var emailKeystorePropertiesFileName = "email-keystore.properties"
+    val emailKeystorePropertiesFileName = "email-keystore.properties"
 
     when (buildVariant) {
         BuildVariants.AOT.arg, BuildVariants.NATIVE.arg -> {

@@ -16,6 +16,7 @@ class GlobalVariables() {
 
     private final fun loadSensitiveWords() {
         val FILE_NAME_LIST = listOf(
+            "广告",
             "反动词库",
             "敏感网址",
             "暴恐词库",
@@ -25,7 +26,7 @@ class GlobalVariables() {
         )
 
         FILE_NAME_LIST.forEach() { it ->
-            val filePath = ClassPathResource("static/sensitive-words/$it.txt").file
+            val filePath = ClassPathResource("static/sensitive-words/$it.txt").inputStream
             val words = FileRepo.readFileAllLines(filePath)
             SENSITIVE_WORDS[it] = words
         }
