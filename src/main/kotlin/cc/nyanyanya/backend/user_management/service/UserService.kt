@@ -27,7 +27,8 @@ class UserService(
             do {
                 user.genRandomNickname()
                 val dbUser = userRepo.selectByNickname(user.nickName)
-            } while (dbUser != UserModel())
+                val hasSensitiveWords = UserModel.haveSensitiveWords(user.nickName)
+            } while (dbUser != UserModel() && !hasSensitiveWords)
             user.genderId = 0
             user.levelId = 1
             saveAvatar(user, avatar.await())
@@ -68,7 +69,8 @@ class UserService(
         do {
             user.genRandomUsername()
             val dbUser = userRepo.selectByUsername(user.username)
-        } while (dbUser != UserModel())
+            val hasSensitiveWords = UserModel.haveSensitiveWords(user.username)
+        } while (dbUser != UserModel() && !hasSensitiveWords)
 
         val result = this.createUser(user)
         return result
