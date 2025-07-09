@@ -7,6 +7,7 @@ import cc.nyanyanya.backend.common.util.bo.DefaultValue
 import cc.nyanyanya.backend.common.util.bo.ResultErrorCode
 import cc.nyanyanya.backend.user_management.service.HomepageService
 import jakarta.servlet.http.HttpSession
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -19,12 +20,15 @@ class HomepageController(
     fun getUserHomepagePrivacySettings(
         session: HttpSession,
     ): Any {
-        val homepagePrivacySettingsInfo = object {
-            var is_display_mail = false
-            var is_display_birthday = false
-            var is_display_fans = false
-            var error = DefaultValue.DEFAULT_BYTE
-        }
+        @RegisterReflectionForBinding
+        data class HomepagePrivacySettingsInfo(
+            var is_display_mail: Boolean = false,
+            var is_display_birthday: Boolean = false,
+            var is_display_fans: Boolean = false,
+            var error: Byte = DefaultValue.DEFAULT_BYTE
+        )
+
+        val homepagePrivacySettingsInfo = HomepagePrivacySettingsInfo()
 
         val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
         if (!isLogin) {
@@ -33,9 +37,8 @@ class HomepageController(
             return homepagePrivacySettingsInfo
         }
 
-        var dbHomepagePrivacySetting = HomepagePrivacySettingModel()
         val sessionId = session.getAttribute("id") as? UUID ?: UserModel.ID_DEFAULT
-        dbHomepagePrivacySetting = homepageService.fetchHomepagePrivacySetting(sessionId)
+        val dbHomepagePrivacySetting = homepageService.fetchHomepagePrivacySetting(sessionId)
 
         homepagePrivacySettingsInfo.is_display_mail = dbHomepagePrivacySetting.isDisplayMail
         homepagePrivacySettingsInfo.is_display_birthday = dbHomepagePrivacySetting.isDisplayBirthday

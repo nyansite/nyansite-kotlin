@@ -2,7 +2,6 @@ package cc.nyanyanya.backend.user_management.repository
 
 import cc.nyanyanya.backend.user_management.entity.FollowGroup
 import cc.nyanyanya.backend.user_management.entity.FollowList
-import cc.nyanyanya.backend.common.persistence.mapper.FanGroupMapper
 import cc.nyanyanya.backend.common.persistence.mapper.FanMapper
 import cc.nyanyanya.backend.common.persistence.model.FanModel
 import cc.nyanyanya.backend.common.persistence.repository.FanGroupRepo
@@ -14,7 +13,6 @@ import java.util.*
 @Repository
 class FollowRepo(
     private val fanMapper: FanMapper,
-    private val fanGroupMapper: FanGroupMapper,
     private val fanGroupRepo: FanGroupRepo
 ) {
     fun getAllFollows(id: UUID): FollowList {

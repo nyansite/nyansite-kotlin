@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="RemoteTargetsManager">
-    <option name="projectDefaultTargetUuid" value="a8efce50-1ce3-47f9-a94f-be821e9ef69c" />
     <targets>
       <target name="nyaside-dev@remote" type="ssh/sftp" uuid="a8efce50-1ce3-47f9-a94f-be821e9ef69c">
         <config>
@@ -12,6 +11,18 @@
         <ContributedStateBase type="JavaLanguageRuntime">
           <config>
             <option name="homePath" value="/opt/graalvm/graalvm-jdk-24+36.1" />
+          </config>
+        </ContributedStateBase>
+      </target>
+      <target name="nameless@vm" type="ssh/sftp" uuid="618f463c-07bd-407c-bad0-7e6b40f5520b">
+        <config>
+          <option name="projectRootOnTarget" value="/opt/website/nyaside/backend" />
+          <option name="serverName" value="nameless@vm" />
+          <option name="useRsync" value="true" />
+        </config>
+        <ContributedStateBase type="JavaLanguageRuntime">
+          <config>
+            <option name="homePath" value="/home/nameless/graalvm-jdk-24+36.1" />
           </config>
         </ContributedStateBase>
       </target>

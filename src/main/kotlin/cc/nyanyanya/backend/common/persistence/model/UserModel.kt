@@ -96,10 +96,10 @@ data class UserModel(
             return regex.matches(email)
         }
 
-        fun verifyPhoneFormat(phone: String): Boolean {
-            val regex = Regex("^[\\d]{12,14}$")
-            return regex.matches(phone)
-        }
+//        fun verifyPhoneFormat(phone: String): Boolean {
+//            val regex = Regex("^[\\d]{12,14}$")
+//            return regex.matches(phone)
+//        }
 
         fun verifyAvatarFormat(avatarEncodeString: String): Boolean {
             val avatarFileExtensionList = "jpg|gif|jpeg|png|gif|bmp|webp|svg|tiff|ico|jfif|tif"
@@ -139,22 +139,6 @@ data class UserModel(
             return regex.matches(password)
         }
     }
-
-//    constructor() : this(
-//        id = ID_DEFAULT,
-//        username = USERNAME_DEFAULT,
-//        nickName = NICKNAME_DEFAULT,
-//        phone = PHONE_DEFAULT,
-//        genderId = GENDER_ID_DEFAULT,
-//        email = EMAIL_DEFAULT,
-//        avatarPath = AVATAR_PATH_DEFAULT,
-//        birthday = BIRTHDAY_DEFAULT,
-//        levelId = LEVEL_ID_DEFAULT,
-//        signupTime = SIGNUP_TIME_DEFAULT,
-//        password = PASSWORD_DEFAULT,
-//        phoneModifyTime = PHONE_MODIFY_TIME_DEFAULT,
-//        emailModifyTime = EMAIL_MODIFY_TIME_DEFAULT,
-//    )
 
     fun genAvatarFilePath(
         avatarEncodeString: String

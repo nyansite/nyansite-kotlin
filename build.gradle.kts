@@ -72,7 +72,7 @@ dependencies {
     implementation("com.baomidou", "mybatis-plus-jsqlparser", MYBATIS_PLUS_VERSION)
     implementation("com.baomidou", "mybatis-plus", MYBATIS_PLUS_VERSION)
     implementation("com.baomidou", "mybatis-plus-spring-boot3-starter", MYBATIS_PLUS_VERSION)
-    implementation("com.github.yulichang:mybatis-plus-join-boot-starter:1.5.3")
+    implementation("com.github.yulichang:mybatis-plus-join-boot-starter:1.5.4")
 
     implementation("com.fasterxml.uuid:java-uuid-generator:5.1.0")
     implementation("com.squareup.okio:okio:3.10.2")

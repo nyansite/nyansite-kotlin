@@ -4,11 +4,9 @@ import cc.nyanyanya.backend.common.util.bo.DefaultValue
 import java.util.*
 
 data class FollowList (
-    var userId: UUID,
-    var groups: MutableList<FollowGroup>,
+    var userId: UUID = USER_ID_DEFAULT,
+    var groups: MutableList<FollowGroup> = GROUPS_DEFAULT,
 ) {
-    constructor() : this(USER_ID_DEFAULT, GROUPS_DEFAULT)
-
     companion object {
         val USER_ID_DEFAULT = DefaultValue().DEFAULT_UUID
         val GROUPS_DEFAULT = mutableListOf<FollowGroup>()

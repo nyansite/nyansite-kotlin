@@ -14,6 +14,7 @@ import cc.nyanyanya.backend.user_management.service.FollowService
 import cc.nyanyanya.backend.user_management.service.UserService
 import jakarta.servlet.http.HttpSession
 import org.apache.commons.lang3.time.DateUtils
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -91,19 +92,22 @@ class UserController(
             }
             followsInfo
         }
-        val userInfo = object {
-            var id = UserModel.ID_DEFAULT
-            var username = UserModel.USERNAME_DEFAULT
-            var name = UserModel.NICKNAME_DEFAULT
-            var gender = UserModel.GENDER_ID_DEFAULT
-            var mail = UserModel.EMAIL_DEFAULT
-            var level = UserModel.LEVEL_ID_DEFAULT
-            var avatar = ""
-            var birthday = UserModel.BIRTHDAY_DEFAULT
-            var follows = listOf<Any>()
-            var fans = listOf<Any>()
-            var error = DefaultValue.DEFAULT_BYTE
-        }
+
+        @RegisterReflectionForBinding
+        data class UserInfo(
+            var id: UUID = UserModel.ID_DEFAULT,
+            var username: String = UserModel.USERNAME_DEFAULT,
+            var name: String = UserModel.NICKNAME_DEFAULT,
+            var gender: Short = UserModel.GENDER_ID_DEFAULT,
+            var mail: String = UserModel.EMAIL_DEFAULT,
+            var level: Short = UserModel.LEVEL_ID_DEFAULT,
+            var avatar: String = "",
+            var birthday: Date = UserModel.BIRTHDAY_DEFAULT,
+            var follows: List<Any> = listOf<Any>(),
+            var fans: List<Any> = listOf<Any>(),
+            var error: Byte = DefaultValue.DEFAULT_BYTE,
+        )
+        val userInfo = UserInfo()
 
         val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
         if (!isLogin) {
@@ -136,10 +140,12 @@ class UserController(
         @RequestParam username: String,
         session: HttpSession,
     ): Any {
-        val usernameInfo = object {
-            var id = UserModel.ID_DEFAULT
-            var error = DefaultValue.DEFAULT_BYTE
-        }
+        @RegisterReflectionForBinding
+        data class UsernameInfo(
+            var id: UUID = UserModel.ID_DEFAULT,
+            var error: Byte = DefaultValue.DEFAULT_BYTE,
+        )
+        val usernameInfo = UsernameInfo()
 
         if (username == "") {
             usernameInfo.error = 1.toByte()
@@ -204,18 +210,21 @@ class UserController(
             }
             followsInfo
         }
-        val otherUserInfo = object {
-            var username = UserModel.USERNAME_DEFAULT
-            var name = UserModel.NICKNAME_DEFAULT
-            var gender = UserModel.GENDER_ID_DEFAULT
-            var mail = UserModel.EMAIL_DEFAULT
-            var level = UserModel.LEVEL_ID_DEFAULT
-            var avatar = ""
-            var birthday = UserModel.BIRTHDAY_DEFAULT
-            var follows = listOf<Any>()
-            var fans = listOf<Any>()
-            var error = DefaultValue.DEFAULT_BYTE
-        }
+
+        @RegisterReflectionForBinding
+        data class OtherUserInfo(
+            var username: String = UserModel.USERNAME_DEFAULT,
+            var name: String = UserModel.NICKNAME_DEFAULT,
+            var gender: Short = UserModel.GENDER_ID_DEFAULT,
+            var mail: String = UserModel.EMAIL_DEFAULT,
+            var level: Short = UserModel.LEVEL_ID_DEFAULT,
+            var avatar: String = "",
+            var birthday: Date = UserModel.BIRTHDAY_DEFAULT,
+            var follows: List<Any> = listOf<Any>(),
+            var fans: List<Any> = listOf<Any>(),
+            var error: Byte = DefaultValue.DEFAULT_BYTE,
+        )
+        val otherUserInfo = OtherUserInfo()
 
         if (id == "") {
             otherUserInfo.error = 1.toByte()

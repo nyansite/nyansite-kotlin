@@ -5,12 +5,10 @@ import cc.nyanyanya.backend.common.util.bo.DefaultValue
 import java.util.*
 
 data class FollowGroup (
-    var userId: UUID,
-    var name: String,
-    var follows: MutableList<FanModel>,
+    var userId: UUID = USER_ID_DEFAULT,
+    var name: String = NAME_DEFAULT,
+    var follows: MutableList<FanModel> = FOLLOWS_DEFAULT,
 ) {
-    constructor() : this(USER_ID_DEFAULT, NAME_DEFAULT, FOLLOWS_DEFAULT)
-
     companion object {
         val USER_ID_DEFAULT = DefaultValue().DEFAULT_UUID
         const val NAME_DEFAULT = ""
