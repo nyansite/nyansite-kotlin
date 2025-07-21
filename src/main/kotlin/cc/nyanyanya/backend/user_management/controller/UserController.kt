@@ -546,7 +546,7 @@ class UserController(
         }
 
         val sessionVerificationCode = session.getAttribute("verificationCode") as? String ?: ""
-        if (code != sessionVerificationCode) {
+        if (mail != "" && code != sessionVerificationCode) {
             return ResultErrorCode(5)
         }
 
