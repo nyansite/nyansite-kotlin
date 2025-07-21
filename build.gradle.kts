@@ -43,14 +43,14 @@ repositories {
 }
 
 dependencies {
-    implementation("org.apache.commons:commons-lang3:3.17.0")
+    implementation("org.apache.commons:commons-lang3:3.18.0")
     implementation("commons-io:commons-io:2.18.0")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
 
     implementation("org.springframework.boot", "spring-boot-starter-jdbc", SPRING_BOOT_VERSION)
     implementation("org.springframework.boot", "spring-boot-starter-web", SPRING_BOOT_VERSION)
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.2")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4")
     implementation("org.springframework.boot", "spring-boot-starter-actuator", SPRING_BOOT_VERSION)

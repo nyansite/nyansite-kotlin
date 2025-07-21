@@ -2,10 +2,10 @@
 <project version="4">
   <component name="RemoteTargetsManager">
     <targets>
-      <target name="nyaside-dev@remote" type="ssh/sftp" uuid="a8efce50-1ce3-47f9-a94f-be821e9ef69c">
+      <target name="nameless@remote" type="ssh/sftp" uuid="a8efce50-1ce3-47f9-a94f-be821e9ef69c">
         <config>
           <option name="projectRootOnTarget" value="/opt/website/nyaside/backend" />
-          <option name="serverName" value="nyaside-dev@remote" />
+          <option name="serverName" value="nameless@remote" />
           <option name="useRsync" value="true" />
         </config>
         <ContributedStateBase type="JavaLanguageRuntime">

@@ -15,6 +15,8 @@ import cc.nyanyanya.backend.user_management.service.UserService
 import jakarta.servlet.http.HttpSession
 import org.apache.commons.lang3.time.DateUtils
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
+import org.springframework.context.annotation.Scope
+import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -65,6 +67,23 @@ class UserController(
         return ResultErrorCode(2)
     }
 
+    @RegisterReflectionForBinding
+    @Component
+    @Scope("prototype")
+    data class UserInfo(
+        var id: UUID = UserModel.ID_DEFAULT,
+        var username: String = UserModel.USERNAME_DEFAULT,
+        var name: String = UserModel.NICKNAME_DEFAULT,
+        var gender: Short = UserModel.GENDER_ID_DEFAULT,
+        var mail: String = UserModel.EMAIL_DEFAULT,
+        var level: Short = UserModel.LEVEL_ID_DEFAULT,
+        var avatar: String = "",
+        var birthday: Date = UserModel.BIRTHDAY_DEFAULT,
+        var follows: List<Any> = listOf<Any>(),
+        var fans: List<Any> = listOf<Any>(),
+        var error: Byte = DefaultValue.DEFAULT_BYTE,
+    )
+
     @PostMapping("/get-own-info")
     fun getOwnInfo(
         session: HttpSession,
@@ -93,20 +112,6 @@ class UserController(
             followsInfo
         }
 
-        @RegisterReflectionForBinding
-        data class UserInfo(
-            var id: UUID = UserModel.ID_DEFAULT,
-            var username: String = UserModel.USERNAME_DEFAULT,
-            var name: String = UserModel.NICKNAME_DEFAULT,
-            var gender: Short = UserModel.GENDER_ID_DEFAULT,
-            var mail: String = UserModel.EMAIL_DEFAULT,
-            var level: Short = UserModel.LEVEL_ID_DEFAULT,
-            var avatar: String = "",
-            var birthday: Date = UserModel.BIRTHDAY_DEFAULT,
-            var follows: List<Any> = listOf<Any>(),
-            var fans: List<Any> = listOf<Any>(),
-            var error: Byte = DefaultValue.DEFAULT_BYTE,
-        )
         val userInfo = UserInfo()
 
         val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
@@ -134,17 +139,19 @@ class UserController(
         return userInfo
     }
 
+    @RegisterReflectionForBinding
+    @Component
+    @Scope("prototype")
+    data class UsernameInfo(
+        var id: UUID = UserModel.ID_DEFAULT,
+        var error: Byte = DefaultValue.DEFAULT_BYTE,
+    )
 
     @PostMapping("/get-user-id")
     fun getUserId(
         @RequestParam username: String,
         session: HttpSession,
     ): Any {
-        @RegisterReflectionForBinding
-        data class UsernameInfo(
-            var id: UUID = UserModel.ID_DEFAULT,
-            var error: Byte = DefaultValue.DEFAULT_BYTE,
-        )
         val usernameInfo = UsernameInfo()
 
         if (username == "") {
@@ -184,6 +191,22 @@ class UserController(
         return usernameInfo
     }
 
+    @RegisterReflectionForBinding
+    @Component
+    @Scope("prototype")
+    data class OtherUserInfo(
+        var username: String = UserModel.USERNAME_DEFAULT,
+        var name: String = UserModel.NICKNAME_DEFAULT,
+        var gender: Short = UserModel.GENDER_ID_DEFAULT,
+        var mail: String = UserModel.EMAIL_DEFAULT,
+        var level: Short = UserModel.LEVEL_ID_DEFAULT,
+        var avatar: String = "",
+        var birthday: Date = UserModel.BIRTHDAY_DEFAULT,
+        var follows: List<Any> = listOf<Any>(),
+        var fans: List<Any> = listOf<Any>(),
+        var error: Byte = DefaultValue.DEFAULT_BYTE,
+    )
+
     @PostMapping("/get-user-info")
     fun getUserInfo(
         @RequestParam id: String,
@@ -211,19 +234,6 @@ class UserController(
             followsInfo
         }
 
-        @RegisterReflectionForBinding
-        data class OtherUserInfo(
-            var username: String = UserModel.USERNAME_DEFAULT,
-            var name: String = UserModel.NICKNAME_DEFAULT,
-            var gender: Short = UserModel.GENDER_ID_DEFAULT,
-            var mail: String = UserModel.EMAIL_DEFAULT,
-            var level: Short = UserModel.LEVEL_ID_DEFAULT,
-            var avatar: String = "",
-            var birthday: Date = UserModel.BIRTHDAY_DEFAULT,
-            var follows: List<Any> = listOf<Any>(),
-            var fans: List<Any> = listOf<Any>(),
-            var error: Byte = DefaultValue.DEFAULT_BYTE,
-        )
         val otherUserInfo = OtherUserInfo()
 
         if (id == "") {

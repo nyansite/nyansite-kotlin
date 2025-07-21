@@ -1,33 +1,37 @@
 package cc.nyanyanya.backend.user_management.controller
 
 
-import cc.nyanyanya.backend.common.persistence.model.HomepagePrivacySettingModel
 import cc.nyanyanya.backend.common.persistence.model.UserModel
 import cc.nyanyanya.backend.common.util.bo.DefaultValue
 import cc.nyanyanya.backend.common.util.bo.ResultErrorCode
 import cc.nyanyanya.backend.user_management.service.HomepageService
 import jakarta.servlet.http.HttpSession
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
+import org.springframework.context.annotation.Scope
+import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.*
 import java.util.*
+
 
 @RestController
 @RequestMapping("/user")
 class HomepageController(
     private val homepageService: HomepageService,
 ) {
+    @RegisterReflectionForBinding
+    @Component
+    @Scope("prototype")
+    data class HomepagePrivacySettingsInfo(
+        var is_display_mail: Boolean = false,
+        var is_display_birthday: Boolean = false,
+        var is_display_fans: Boolean = false,
+        var error: Byte = DefaultValue.DEFAULT_BYTE
+    )
+
     @PostMapping("/get-user-homepage-privacy-settings")
     fun getUserHomepagePrivacySettings(
         session: HttpSession,
     ): Any {
-        @RegisterReflectionForBinding
-        data class HomepagePrivacySettingsInfo(
-            var is_display_mail: Boolean = false,
-            var is_display_birthday: Boolean = false,
-            var is_display_fans: Boolean = false,
-            var error: Byte = DefaultValue.DEFAULT_BYTE
-        )
-
         val homepagePrivacySettingsInfo = HomepagePrivacySettingsInfo()
 
         val isLogin = session.getAttribute("isLogin") as? Boolean ?: false
