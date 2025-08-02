@@ -22,7 +22,7 @@ class FanGroupService(
         val fanGroupSpecial = FanGroupModel(
             id = UuidGenerator.genUuidV7(),
             userId = userId,
-            number = 1.toShort(),
+            number = 0.toShort(),
             name = "special",
         )
         val resultSpecial = fanGroupRepo.insert(fanGroupSpecial)

@@ -84,6 +84,14 @@ class UserController(
         var error: Byte = DefaultValue.DEFAULT_BYTE,
     )
 
+    @RegisterReflectionForBinding
+    @Component
+    @Scope("prototype")
+    data class FollowsInfo(
+        var group_name: String = "",
+        var user_ids: MutableList<UUID> = mutableListOf()
+    )
+
     @PostMapping("/get-own-info")
     fun getOwnInfo(
         session: HttpSession,
@@ -103,10 +111,10 @@ class UserController(
 
             followList.groups.forEach { it ->
                 followsInfo.add(
-                    object {
-                        val group_name = it.name
-                        val user_ids = it.follows.map { it.userId }.toMutableList()
-                    }
+                    FollowsInfo(
+                        group_name = it.name,
+                        user_ids = it.follows.map { it.userId }.toMutableList(),
+                    )
                 )
             }
             followsInfo
@@ -225,10 +233,10 @@ class UserController(
 
             followList.groups.forEach { it ->
                 followsInfo.add(
-                    object {
-                        val group_name = it.name
-                        val user_ids = it.follows.map { it.userId }.toMutableList()
-                    }
+                    FollowsInfo(
+                        group_name = it.name,
+                        user_ids = it.follows.map { it.userId }.toMutableList(),
+                    )
                 )
             }
             followsInfo
