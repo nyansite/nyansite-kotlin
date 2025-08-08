@@ -2,13 +2,19 @@ import java.io.FileInputStream
 import java.util.Properties
 
 val keystoreProperties = mutableListOf<Properties>()
-enum class BuildVariants(val arg: String) {
+enum class ProductFlavors(val arg: String) {
     AOT("aot"), //使用AOT编译
     NATIVE("native"), //使用原生编译
     TEST("test"), //使用虚拟机数据库本地测试
     NATIVE_TEST("native_test"), //使用虚拟机数据库本地原生测试
 }
-val buildVariant = properties["buildVariant"] ?: BuildVariants.AOT.arg
+val productFlavors = properties["productFlavors"] ?: ProductFlavors.AOT.arg
+enum class BuildType(val arg: String) {
+    RELEASE("release"),
+    DEBUG("debug"),
+}
+val buildType = properties["buildType"] ?: BuildType.RELEASE.arg
+
 
 prepareConfig()
 loadConfig()
@@ -64,7 +70,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.11.4")
 //    implementation(kotlin("stdlib-jdk8"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION")
-    if (buildVariant != BuildVariants.NATIVE.arg && buildVariant != BuildVariants.NATIVE_TEST.arg) {
+    if (productFlavors != ProductFlavors.NATIVE.arg && productFlavors != ProductFlavors.NATIVE_TEST.arg) {
         testImplementation("org.springframework.boot", "spring-boot-starter-test", SPRING_BOOT_VERSION)
 //        testImplementation("org.mybatis.spring.boot", "mybatis-spring-boot-starter-test:3.0.4", SPRING_BOOT_VERSION)
     }
@@ -84,7 +90,7 @@ kotlin {
     }
 }
 
-if (buildVariant != BuildVariants.NATIVE.arg && buildVariant != BuildVariants.NATIVE_TEST.arg) {
+if (productFlavors != ProductFlavors.NATIVE.arg && productFlavors != ProductFlavors.NATIVE_TEST.arg) {
     tasks.withType<Test> {
         useJUnitPlatform()
     }
@@ -96,15 +102,26 @@ fun prepareConfig() {
     var databaseKeystorePropertiesFileName = "database-keystore.properties"
     val emailKeystorePropertiesFileName = "email-keystore.properties"
 
-    when (buildVariant) {
-        BuildVariants.AOT.arg, BuildVariants.NATIVE.arg -> {
+    val loggingProperties = Properties()
+
+    when (productFlavors) {
+        ProductFlavors.AOT.arg, ProductFlavors.NATIVE.arg -> {
             databaseKeystorePropertiesFileName = "database-keystore.properties"
         }
-        BuildVariants.TEST.arg, BuildVariants.NATIVE_TEST.arg -> {
+        ProductFlavors.TEST.arg, ProductFlavors.NATIVE_TEST.arg -> {
             databaseKeystorePropertiesFileName = "test-database-keystore.properties"
         }
     }
+    when (buildType) {
+        BuildType.RELEASE.arg -> {
+            loggingProperties["logging.level.root"] = "INFO"
+        }
+        BuildType.DEBUG.arg -> {
+            loggingProperties["logging.level.root"] = "DEBUG"
+        }
+    }
 
+    keystoreProperties.add(loggingProperties)
     val databaseKeystorePropertiesFile = rootProject.file(databaseKeystorePropertiesFileName)
     val databaseKeystoreProperties = Properties()
     keystoreProperties.add(databaseKeystoreProperties)

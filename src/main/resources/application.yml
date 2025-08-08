@@ -25,6 +25,11 @@ spring:
             trust: @spring.mail.properties.mail.smtp.ssl.trust@
 
 
+logging:
+  level:
+    root: @logging.level.root@
+
+
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

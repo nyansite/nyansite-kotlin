@@ -102,8 +102,8 @@ data class UserModel(
 //        }
 
         fun verifyAvatarFormat(avatarEncodeString: String): Boolean {
-            val avatarFileExtensionList = "jpg|gif|jpeg|png|gif|bmp|webp|svg|tiff|ico|jfif|tif"
-            val regex = Regex("^data:image/(?:${avatarFileExtensionList});base64,([A-Za-z0-9+/=]+)$")
+            val avatarMineTypeList = "gif|jpeg|png|bmp|webp|svg+xml|tiff|vnd.microsoft.icon"
+            val regex = Regex("^data:image/(?:${avatarMineTypeList});base64,([A-Za-z0-9+/=]+)$")
             return regex.matches(avatarEncodeString)
         }
 
@@ -143,10 +143,19 @@ data class UserModel(
     fun genAvatarFilePath(
         avatarEncodeString: String
     ): String {
-        val regex = Regex("(?<=data:image/)[A-Za-z]+(?=;base64,[A-Za-z0-9+/=]+)")
-        val fileExtension = regex.find(avatarEncodeString)?.value ?: ""
+        val regex = Regex("(?<=data:image/)[.+A-Za-z]+(?=;base64,[A-Za-z0-9+/=]+)")
+        val avatarMineType = regex.find(avatarEncodeString)?.value ?: ""
+        if (avatarMineType == "") return ""
+        var fileExtension = ""
+        when (avatarMineType) {
+            "svg+xml" ->
+                fileExtension = "svg"
+            "vnd.microsoft.icon" ->
+                fileExtension = "icon"
+            else ->
+                fileExtension = avatarMineType
+        }
 
-        if (fileExtension == "") return ""
         val filePath = "/opt/website/nyaside/backend/resources/images/avatar/${id}.${fileExtension}"
         this.avatarPath = filePath
         return filePath
@@ -196,7 +205,7 @@ data class UserModel(
         val avatarString = asyncResult.await()
         val avatarBase64String = Base64.getEncoder()
             .encodeToString(avatarString.toByteArray(Charset.forName("UTF-8")))
-        val encodeString = "data:image/svg;base64,${avatarBase64String}"
+        val encodeString = "data:image/svg+xml;base64,${avatarBase64String}"
         return@coroutineScope encodeString
     }
 

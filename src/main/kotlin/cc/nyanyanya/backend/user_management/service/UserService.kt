@@ -131,10 +131,12 @@ class UserService(
         user: UserModel,
         avatarEncodeString: String,
     ) {
-        val avatarFileExtensionList = "jpg|gif|jpeg|png|gif|bmp|webp|svg|tiff|ico|jfif|tif"
-        val regex = Regex("(?<=data:image/(${avatarFileExtensionList});base64,)[A-Za-z0-9+/=]+")
+        val avatarMineTypeList = "gif|jpeg|png|bmp|webp|svg\\+xml|tiff|vnd\\.microsoft\\.icon"
+        val regex = Regex("(?<=data:image/($avatarMineTypeList);base64,)[A-Za-z0-9+/=]+")
         val avatarBase64String = regex.find(avatarEncodeString)?.value ?: ""
 
+//        logger.debug("UserService:saveAvatar:avatarEncodeString = $avatarEncodeString")
+//        logger.debug("UserService:saveAvatar:avatarBase64String = $avatarBase64String")
         if (avatarBase64String == "") return
         val filePath = user.genAvatarFilePath(avatarEncodeString)
         if (filePath == "") return
@@ -144,7 +146,16 @@ class UserService(
     fun loadAvatar(avatarPath: String): String {
         val avatarBase64String = FileRepo.readFileToBase64String(avatarPath)
         val fileExtension = FilenameUtils.getExtension(avatarPath)
-        val encodeString = "data:image/${fileExtension};base64,${avatarBase64String}"
+        var avatarMineType = ""
+        when (fileExtension) {
+            "svg" ->
+                avatarMineType = "svg+xml"
+            "icon" ->
+                avatarMineType = "vnd.microsoft.icon"
+            else ->
+                avatarMineType = fileExtension
+        }
+        val encodeString = "data:image/${avatarMineType};base64,${avatarBase64String}"
 
         return encodeString
     }
