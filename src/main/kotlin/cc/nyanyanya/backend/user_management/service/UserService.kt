@@ -167,4 +167,12 @@ class UserService(
         val dbGender = genderRepo.selectByAlias(genderAlias)
         user.genderId = dbGender.id ?: 0
     }
+
+    fun getGenderAlias(
+        id: Short
+    ): String {
+        val dbGender = genderRepo.selectById(id)
+        val dbGenderAlias = dbGender.alias
+        return dbGenderAlias
+    }
 }

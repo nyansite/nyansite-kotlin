@@ -12,6 +12,7 @@ import cc.nyanyanya.backend.user_management.service.EmailService
 import cc.nyanyanya.backend.user_management.service.FanService
 import cc.nyanyanya.backend.user_management.service.FollowService
 import cc.nyanyanya.backend.user_management.service.UserService
+import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.servlet.http.HttpSession
 import org.apache.commons.lang3.time.DateUtils
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
@@ -74,7 +75,7 @@ class UserController(
         var id: UUID = UserModel.ID_DEFAULT,
         var username: String = UserModel.USERNAME_DEFAULT,
         var name: String = UserModel.NICKNAME_DEFAULT,
-        var gender: Short = UserModel.GENDER_ID_DEFAULT,
+        var gender: String = "",
         var mail: String = UserModel.EMAIL_DEFAULT,
         var level: Short = UserModel.LEVEL_ID_DEFAULT,
         var avatar: String = "",
@@ -88,8 +89,8 @@ class UserController(
     @Component
     @Scope("prototype")
     data class FollowsInfo(
-        var group_name: String = "",
-        var user_ids: MutableList<UUID> = mutableListOf()
+        @JsonProperty("group_name") var groupName: String = "",
+        @JsonProperty("user_ids") var userIds: MutableList<UUID> = mutableListOf()
     )
 
     @PostMapping("/get-own-info")
@@ -112,8 +113,8 @@ class UserController(
             followList.groups.forEach { it ->
                 followsInfo.add(
                     FollowsInfo(
-                        group_name = it.name,
-                        user_ids = it.follows.map { it.userId }.toMutableList(),
+                        groupName = it.name,
+                        userIds = it.follows.map { it.userId }.toMutableList(),
                     )
                 )
             }
@@ -135,10 +136,9 @@ class UserController(
         userInfo.id = dbUser.id
         userInfo.username = dbUser.username
         userInfo.name = dbUser.nickName
-        userInfo.gender = dbUser.genderId
+        userInfo.gender = userService.getGenderAlias(dbUser.genderId)
         userInfo.mail = dbUser.email
         userInfo.level = dbUser.levelId
-        // TODO: localdebug
         userInfo.avatar = userService.loadAvatar(dbUser.avatarPath)
         userInfo.birthday = dbUser.birthday
         userInfo.follows = followsInfoTransformer(followService.fetchAllFollows(dbUser.id))
@@ -205,7 +205,7 @@ class UserController(
     data class OtherUserInfo(
         var username: String = UserModel.USERNAME_DEFAULT,
         var name: String = UserModel.NICKNAME_DEFAULT,
-        var gender: Short = UserModel.GENDER_ID_DEFAULT,
+        var gender: String = "",
         var mail: String = UserModel.EMAIL_DEFAULT,
         var level: Short = UserModel.LEVEL_ID_DEFAULT,
         var avatar: String = "",
@@ -234,8 +234,8 @@ class UserController(
             followList.groups.forEach { it ->
                 followsInfo.add(
                     FollowsInfo(
-                        group_name = it.name,
-                        user_ids = it.follows.map { it.userId }.toMutableList(),
+                        groupName = it.name,
+                        userIds = it.follows.map { it.userId }.toMutableList(),
                     )
                 )
             }
@@ -276,10 +276,9 @@ class UserController(
 
         otherUserInfo.username = dbOtherUser.username
         otherUserInfo.name = dbOtherUser.nickName
-        otherUserInfo.gender = dbOtherUser.genderId
+        otherUserInfo.gender = userService.getGenderAlias(dbOtherUser.genderId)
         otherUserInfo.mail = dbOtherUser.email
         otherUserInfo.level = dbOtherUser.levelId
-        // TODO: localdebug
         otherUserInfo.avatar = userService.loadAvatar(dbOtherUser.avatarPath)
         otherUserInfo.birthday = dbOtherUser.birthday
         otherUserInfo.follows = followsInfoTransformer(followService.fetchAllFollows(dbOtherUser.id))

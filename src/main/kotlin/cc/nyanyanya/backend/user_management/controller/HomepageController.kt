@@ -5,6 +5,7 @@ import cc.nyanyanya.backend.common.persistence.model.UserModel
 import cc.nyanyanya.backend.common.util.bo.DefaultValue
 import cc.nyanyanya.backend.common.util.bo.ResultErrorCode
 import cc.nyanyanya.backend.user_management.service.HomepageService
+import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.servlet.http.HttpSession
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.annotation.Scope
@@ -22,7 +23,7 @@ class HomepageController(
     @Component
     @Scope("prototype")
     data class HomepagePrivacySettingsInfo(
-        var is_display_mail: Boolean = false,
+        @JsonProperty("is_display_mail") var isDisplayMail: Boolean = false,
         var is_display_birthday: Boolean = false,
         var is_display_fans: Boolean = false,
         var error: Byte = DefaultValue.DEFAULT_BYTE
@@ -44,7 +45,7 @@ class HomepageController(
         val sessionId = session.getAttribute("id") as? UUID ?: UserModel.ID_DEFAULT
         val dbHomepagePrivacySetting = homepageService.fetchHomepagePrivacySetting(sessionId)
 
-        homepagePrivacySettingsInfo.is_display_mail = dbHomepagePrivacySetting.isDisplayMail
+        homepagePrivacySettingsInfo.isDisplayMail = dbHomepagePrivacySetting.isDisplayMail
         homepagePrivacySettingsInfo.is_display_birthday = dbHomepagePrivacySetting.isDisplayBirthday
         homepagePrivacySettingsInfo.is_display_fans = dbHomepagePrivacySetting.isDisplayFollowsAndFans
         homepagePrivacySettingsInfo.error = 0.toByte()

@@ -14,4 +14,12 @@ class GenderRepo(private val genderMapper: GenderMapper) {
         val genderModel = genderMapper.selectOne(queryWrapper) ?: GenderModel()
         return genderModel
     }
+
+    fun selectById(id: Short): GenderModel {
+        val queryWrapper = KtQueryWrapper(GenderModel::class.java)
+            .eq(GenderModel::id, id)
+
+        val genderModel = genderMapper.selectOne(queryWrapper) ?: GenderModel()
+        return genderModel
+    }
 }
